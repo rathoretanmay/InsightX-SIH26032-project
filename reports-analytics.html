@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports and Analytics — SIH26032 Procurement Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E;
+    --green-700: #2D4A2B;
+    --green-500: #4C6E48;
+    --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7;
+    --gold: #C9962C;
+    --gold-dark: #9C7420;
+    --gold-bg: #FBF1DD;
+    --white: #FFFFFF;
+    --ink: #1E231E;
+    --ink-soft: #5A6156;
+    --border: #D6DCCE;
+    --danger: #B23A2E;
+    --danger-bg: #FBEAE7;
+    --success: #2D6A3E;
+    --success-bg: #E2F1E4;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--sage-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--green-700);
+    color: var(--white);
+    padding: 0 2rem;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--green-100); }
+  .centre-tag {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.65);
+    border-left: 1px solid rgba(255,255,255,0.25);
+    padding-left: 10px;
+    margin-left: 4px;
+  }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .staff-badge { display: flex; align-items: center; gap: 8px; }
+  .staff-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gold); color: var(--green-900);
+    font-size: 12.5px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .staff-name { font-size: 13.5px; font-weight: 500; }
+  .staff-role { font-size: 11.5px; color: rgba(255,255,255,0.6); }
+  .logout-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.3);
+    color: var(--white); font-size: 12.5px; font-family: 'Inter', sans-serif;
+    padding: 7px 13px; border-radius: 8px; cursor: pointer;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.08); }
+
+  .subnav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .subnav .current { color: var(--green-900); font-weight: 500; }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+  }
+
+  .page-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .page-title { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 600; }
+  .page-sub { font-size: 13.5px; color: var(--ink-soft); margin-top: 3px; }
+
+  .control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .period-tabs {
+    display: flex;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 3px;
+  }
+  .period-tab {
+    font-size: 12.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 7px 14px;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    border-radius: 7px;
+    cursor: pointer;
+  }
+  .period-tab.active { background: var(--green-700); color: var(--white); }
+
+  .control-right { display: flex; gap: 8px; align-items: center; }
+
+  .demo-toggle button {
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    padding: 7px 12px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .demo-toggle button.active { background: var(--green-900); color: var(--white); border-color: var(--green-900); }
+
+  .export-btn {
+    font-size: 12.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--green-700);
+    background: var(--green-700);
+    color: var(--white);
+    cursor: pointer;
+  }
+  .export-btn:hover { background: var(--green-900); }
+
+  .report-content.hidden { display: none; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .metric-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem;
+  }
+  .metric-label { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 8px; }
+  .metric-value { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 600; color: var(--green-900); }
+  .metric-value.gold { color: var(--gold-dark); }
+  .metric-value.danger { color: var(--danger); }
+  .metric-sub { font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; }
+  .metric-bar-track {
+    height: 5px;
+    background: var(--green-100);
+    border-radius: 4px;
+    margin-top: 9px;
+    overflow: hidden;
+  }
+  .metric-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--green-700);
+    transition: width 0.4s ease;
+  }
+  .metric-bar-fill.gold { background: var(--gold-dark); }
+  .metric-bar-fill.danger { background: var(--danger); }
+
+  .panel-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem 1.5rem;
+  }
+  .panel-title { font-size: 14.5px; font-weight: 600; color: var(--green-900); margin-bottom: 1.1rem; }
+
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 150px;
+  }
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+  }
+  .bar {
+    width: 100%;
+    max-width: 30px;
+    background: var(--green-500);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.4s ease;
+  }
+  .bar-label { font-size: 10.5px; color: var(--ink-soft); margin-top: 6px; }
+  .bar-val { font-size: 10.5px; font-weight: 600; color: var(--green-700); margin-bottom: 4px; }
+
+  .util-row { margin-bottom: 14px; }
+  .util-row:last-child { margin-bottom: 0; }
+  .util-top { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px; }
+  .util-name { font-weight: 500; color: var(--green-900); }
+  .util-pct { color: var(--ink-soft); }
+  .util-track {
+    height: 8px;
+    background: var(--green-100);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .util-fill { height: 100%; background: var(--green-700); border-radius: 6px; transition: width 0.4s ease; }
+
+  .payment-split { display: flex; gap: 20px; margin-top: 1.1rem; }
+  .payment-stat { flex: 1; }
+  .payment-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .payment-dot.paid { background: var(--success); }
+  .payment-dot.pending { background: var(--gold-dark); }
+  .payment-label { font-size: 12px; color: var(--ink-soft); }
+  .payment-value { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 600; margin-top: 4px; }
+
+  .no-data-state {
+    display: none;
+    text-align: center;
+    padding: 3.5rem 1rem;
+    background: var(--white);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+  }
+  .no-data-state.show { display: block; }
+  .no-data-icon { font-size: 32px; margin-bottom: 10px; }
+  .no-data-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+  .no-data-sub { font-size: 13.5px; color: var(--ink-soft); }
+
+  .toast-stack { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 60; }
+  .toast {
+    background: var(--green-900); color: var(--white); font-size: 13px;
+    padding: 11px 16px; border-radius: 9px; box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    opacity: 0; transform: translateY(6px); transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .panel-row { grid-template-columns: 1fr; }
+    main { padding: 1.5rem 1.25rem 3rem; }
+    header { padding: 0 1.25rem; }
+    .subnav { padding: 0 1.25rem; }
+    .centre-tag { display: none; }
+    .control-bar { flex-direction: column; align-items: stretch; }
+    .control-right { justify-content: space-between; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">STAFF PORTAL</div>
+      <div class="centre-tag">Centre A — Ambala Cantt</div>
+    </div>
+    <div class="header-right">
+      <div class="staff-badge">
+        <div class="staff-avatar">RK</div>
+        <div>
+          <div class="staff-name">Ramesh Kumar</div>
+          <div class="staff-role">Centre Operator</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="subnav">
+    <span>Dashboard</span>
+    <span>/</span>
+    <span>Queue management</span>
+    <span>/</span>
+    <span>Status management</span>
+    <span>/</span>
+    <span class="current">Reports</span>
+  </div>
+
+  <main>
+    <div class="page-heading">
+      <div>
+        <div class="page-title">Reports and Analytics</div>
+        <div class="page-sub">Track bookings, waiting time, and centre performance over time.</div>
+      </div>
+    </div>
+
+    <div class="control-bar">
+      <div class="period-tabs" id="periodTabs">
+        <button class="period-tab active" data-period="daily">Daily</button>
+        <button class="period-tab" data-period="weekly">Weekly</button>
+        <button class="period-tab" data-period="monthly">Monthly</button>
+      </div>
+      <div class="control-right">
+        <div class="demo-toggle">
+          <button class="active" id="btnHasData">Has data</button>
+          <button id="btnNoData">No-data state</button>
+        </div>
+        <button class="export-btn" id="exportBtn">Export report</button>
+      </div>
+    </div>
+
+    <div class="report-content" id="reportContent">
+      <div class="metric-grid" id="metricGrid">
+        <div class="metric-card">
+          <div class="metric-label">Total bookings</div>
+          <div class="metric-value" id="mBookings">86</div>
+          <div class="metric-sub" id="mBookingsSub">12 more than previous period</div>
+          <div class="metric-bar-track"><div class="metric-bar-fill" id="mBookingsBar" style="width:0%"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Avg waiting time</div>
+          <div class="metric-value gold" id="mWait">22 min</div>
+          <div class="metric-sub" id="mWaitSub">3 min less than previous period</div>
+          <div class="metric-bar-track"><div class="metric-bar-fill gold" id="mWaitBar" style="width:0%"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Completed procurements</div>
+          <div class="metric-value" id="mCompleted">61</div>
+          <div class="metric-sub" id="mCompletedSub">71% of total bookings</div>
+          <div class="metric-bar-track"><div class="metric-bar-fill" id="mCompletedBar" style="width:0%"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Payment pending</div>
+          <div class="metric-value danger" id="mPending">9</div>
+          <div class="metric-sub" id="mPendingSub">Across all centres</div>
+          <div class="metric-bar-track"><div class="metric-bar-fill danger" id="mPendingBar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="panel-row">
+        <div class="panel">
+          <div class="panel-title" id="trendTitle">Bookings trend — by hour</div>
+          <div class="bar-chart" id="barChart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Centre utilization</div>
+          <div id="utilList"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Payment status</div>
+        <div class="payment-split">
+          <div class="payment-stat">
+            <span class="payment-dot paid"></span><span class="payment-label">Paid</span>
+            <div class="payment-value" id="paidVal">52</div>
+          </div>
+          <div class="payment-stat">
+            <span class="payment-dot pending"></span><span class="payment-label">Payment pending</span>
+            <div class="payment-value" id="pendingVal">9</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-data-state" id="noDataState">
+      <div class="no-data-icon">📊</div>
+      <div class="no-data-title">No data for this period</div>
+      <div class="no-data-sub">Reports will populate once bookings are recorded for the selected range.</div>
+    </div>
+  </main>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+<script>
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    showToast('Logout is wired once this page is linked to the login flow');
+  });
+
+  function showToast(msg) {
+    const stack = document.getElementById('toastStack');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    stack.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 250);
+    }, 2600);
+  }
+
+  const DATASETS = {
+    daily: {
+      trendTitle: 'Bookings trend — by hour',
+      labels: ['8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm'],
+      values: [8, 14, 22, 30, 18, 25, 33, 19, 15, 21, 12, 7, 4],
+      metrics: { bookings: 86, bookingsSub: '12 more than yesterday', bookingsPct: 86, wait: '22 min', waitSub: '3 min less than yesterday', waitPct: 55, completed: 61, completedSub: '71% of today\u2019s bookings', pending: 9, paid: 52 },
+      utilization: [ { name: 'Centre A', pct: 78 }, { name: 'Centre B', pct: 54 }, { name: 'Centre C', pct: 41 } ]
+    },
+    weekly: {
+      trendTitle: 'Bookings trend — by day',
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      values: [62, 74, 58, 81, 96, 103, 47],
+      metrics: { bookings: 521, bookingsSub: '38 more than last week', bookingsPct: 87, wait: '19 min', waitSub: '1 min less than last week', waitPct: 48, completed: 449, completedSub: '86% of week\u2019s bookings', pending: 27, paid: 422 },
+      utilization: [ { name: 'Centre A', pct: 82 }, { name: 'Centre B', pct: 61 }, { name: 'Centre C', pct: 49 } ]
+    },
+    monthly: {
+      trendTitle: 'Bookings trend — by week',
+      labels: ['Week 1','Week 2','Week 3','Week 4'],
+      values: [498, 542, 610, 573],
+      metrics: { bookings: 2223, bookingsSub: '9% more than last month', bookingsPct: 89, wait: '21 min', waitSub: 'Same as last month', waitPct: 53, completed: 1932, completedSub: '87% of month\u2019s bookings', pending: 64, paid: 1868 },
+      utilization: [ { name: 'Centre A', pct: 85 }, { name: 'Centre B', pct: 67 }, { name: 'Centre C', pct: 52 } ]
+    }
+  };
+
+  let currentPeriod = 'daily';
+  let hasData = true;
+
+  function renderChart(period) {
+    const d = DATASETS[period];
+    document.getElementById('trendTitle').textContent = d.trendTitle;
+    const barChart = document.getElementById('barChart');
+    barChart.innerHTML = '';
+    const maxVal = Math.max(...d.values);
+    d.labels.forEach((label, i) => {
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+      const val = document.createElement('div');
+      val.className = 'bar-val';
+      val.textContent = d.values[i];
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = (d.values[i] / maxVal * 100) + '%';
+      const lbl = document.createElement('div');
+      lbl.className = 'bar-label';
+      lbl.textContent = label;
+      col.appendChild(val);
+      col.appendChild(bar);
+      col.appendChild(lbl);
+      barChart.appendChild(col);
+    });
+
+    const m = d.metrics;
+    document.getElementById('mBookings').textContent = m.bookings;
+    document.getElementById('mBookingsSub').textContent = m.bookingsSub;
+    document.getElementById('mWait').textContent = m.wait;
+    document.getElementById('mWaitSub').textContent = m.waitSub;
+    document.getElementById('mCompleted').textContent = m.completed;
+    document.getElementById('mCompletedSub').textContent = m.completedSub;
+    document.getElementById('mPending').textContent = m.pending;
+    document.getElementById('paidVal').textContent = m.paid;
+    document.getElementById('pendingVal').textContent = m.pending;
+
+    const completedPct = Math.round((m.completed / m.bookings) * 100);
+    const pendingPct = Math.round((m.pending / m.bookings) * 100);
+    document.getElementById('mBookingsBar').style.width = m.bookingsPct + '%';
+    document.getElementById('mWaitBar').style.width = m.waitPct + '%';
+    document.getElementById('mCompletedBar').style.width = completedPct + '%';
+    document.getElementById('mPendingBar').style.width = pendingPct + '%';
+
+    const utilList = document.getElementById('utilList');
+    utilList.innerHTML = '';
+    d.utilization.forEach(u => {
+      const row = document.createElement('div');
+      row.className = 'util-row';
+      row.innerHTML = '<div class="util-top"><span class="util-name">' + u.name + '</span><span class="util-pct">' + u.pct + '%</span></div>' +
+        '<div class="util-track"><div class="util-fill" style="width:' + u.pct + '%"></div></div>';
+      utilList.appendChild(row);
+    });
+  }
+
+  document.querySelectorAll('.period-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentPeriod = tab.dataset.period;
+      if (hasData) renderChart(currentPeriod);
+    });
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    showToast('Report exported (demo — no file generated)');
+  });
+
+  const btnHasData = document.getElementById('btnHasData');
+  const btnNoData = document.getElementById('btnNoData');
+  const reportContent = document.getElementById('reportContent');
+  const noDataState = document.getElementById('noDataState');
+
+  btnHasData.addEventListener('click', () => {
+    btnHasData.classList.add('active');
+    btnNoData.classList.remove('active');
+    hasData = true;
+    reportContent.classList.remove('hidden');
+    noDataState.classList.remove('show');
+    renderChart(currentPeriod);
+  });
+
+  btnNoData.addEventListener('click', () => {
+    btnNoData.classList.add('active');
+    btnHasData.classList.remove('active');
+    hasData = false;
+    reportContent.classList.add('hidden');
+    noDataState.classList.add('show');
+  });
+
+  renderChart(currentPeriod);
+</script>
+
+</body>
+</html>
