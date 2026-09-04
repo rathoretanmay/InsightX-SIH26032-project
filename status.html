@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procurement Status Management — SIH26032 Procurement Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E;
+    --green-700: #2D4A2B;
+    --green-500: #4C6E48;
+    --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7;
+    --gold: #C9962C;
+    --gold-dark: #9C7420;
+    --gold-bg: #FBF1DD;
+    --white: #FFFFFF;
+    --ink: #1E231E;
+    --ink-soft: #5A6156;
+    --border: #D6DCCE;
+    --danger: #B23A2E;
+    --danger-bg: #FBEAE7;
+    --success: #2D6A3E;
+    --success-bg: #E2F1E4;
+    --grey-bg: #EEEEEC;
+    --grey-text: #6B6B67;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--sage-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--green-700);
+    color: var(--white);
+    padding: 0 2rem;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--green-100); }
+  .centre-tag {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.65);
+    border-left: 1px solid rgba(255,255,255,0.25);
+    padding-left: 10px;
+    margin-left: 4px;
+  }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .staff-badge { display: flex; align-items: center; gap: 8px; }
+  .staff-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gold); color: var(--green-900);
+    font-size: 12.5px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .staff-name { font-size: 13.5px; font-weight: 500; }
+  .staff-role { font-size: 11.5px; color: rgba(255,255,255,0.6); }
+  .logout-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.3);
+    color: var(--white); font-size: 12.5px; font-family: 'Inter', sans-serif;
+    padding: 7px 13px; border-radius: 8px; cursor: pointer;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.08); }
+
+  .subnav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .subnav .current { color: var(--green-900); font-weight: 500; }
+
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+  }
+
+  .page-heading { margin-bottom: 1.6rem; }
+  .page-title { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 600; }
+  .page-sub { font-size: 13.5px; color: var(--ink-soft); margin-top: 3px; }
+
+  .section { margin-bottom: 2.2rem; }
+  .section-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--green-900);
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .count-badge {
+    background: var(--green-100);
+    color: var(--green-700);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 20px;
+  }
+  .count-badge.attn { background: var(--danger-bg); color: var(--danger); }
+
+  .booking-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.3rem 1.4rem;
+    margin-bottom: 12px;
+  }
+
+  .booking-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.3rem;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .booking-id {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--green-900);
+  }
+  .booking-meta { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; }
+
+  .stepper {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.3rem;
+  }
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+  .step-node {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--grey-bg);
+    color: var(--grey-text);
+    border: 2px solid var(--grey-bg);
+    z-index: 1;
+  }
+  .step.done .step-node { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+  .step.current .step-node { background: var(--white); color: var(--green-700); border-color: var(--green-700); }
+  .step.rejected .step-node { background: var(--danger); color: var(--white); border-color: var(--danger); }
+
+  .step-line {
+    position: absolute;
+    top: 13px;
+    left: -50%;
+    width: 100%;
+    height: 2px;
+    background: var(--grey-bg);
+    z-index: 0;
+  }
+  .step:first-child .step-line { display: none; }
+  .step.done .step-line, .step.current .step-line { background: var(--green-700); }
+  .step.rejected .step-line { background: var(--danger); }
+
+  .step-label {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 7px;
+    max-width: 80px;
+  }
+  .step.done .step-label, .step.current .step-label { color: var(--green-900); font-weight: 500; }
+
+  .booking-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .action-btn {
+    font-size: 12.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .action-btn:hover { border-color: var(--green-500); }
+  .action-btn.primary { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+  .action-btn.primary:hover { background: var(--green-900); }
+  .action-btn.danger-outline { color: var(--danger); border-color: #EBC4BD; }
+  .action-btn.danger-outline:hover { background: var(--danger-bg); }
+
+  .stage-tag {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-left: auto;
+  }
+
+  .attn-card {
+    background: var(--white);
+    border: 1px solid #EBC4BD;
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .attn-info { font-size: 13px; }
+  .attn-reason {
+    display: inline-block;
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-top: 4px;
+  }
+  .attn-note { font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; }
+
+  .empty-row {
+    font-size: 13px;
+    color: var(--ink-soft);
+    padding: 1.2rem;
+    background: var(--white);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30,35,30,0.45);
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1.5rem;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box { background: var(--white); border-radius: 14px; padding: 1.6rem; max-width: 380px; width: 100%; }
+  .modal-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+  .modal-sub { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 1.2rem; line-height: 1.5; }
+  .modal-box label { display: block; font-size: 12.5px; font-weight: 500; color: var(--green-900); margin-bottom: 6px; margin-top: 12px; }
+  .modal-box select, .modal-box textarea {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 9px;
+    padding: 9px 11px; font-family: 'Inter', sans-serif; font-size: 13.5px; resize: vertical;
+  }
+  .modal-box textarea { min-height: 70px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.4rem; }
+
+  .toast-stack {
+    position: fixed; bottom: 20px; right: 20px;
+    display: flex; flex-direction: column; gap: 8px; z-index: 60;
+  }
+  .toast {
+    background: var(--green-900); color: var(--white); font-size: 13px;
+    padding: 11px 16px; border-radius: 9px; box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    opacity: 0; transform: translateY(6px); transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 700px) {
+    header { padding: 0 1.25rem; }
+    .centre-tag { display: none; }
+    .subnav { padding: 0 1.25rem; }
+    main { padding: 1.5rem 1.25rem 3rem; }
+    .step-label { font-size: 9.5px; max-width: 56px; }
+    .booking-actions { width: 100%; }
+    .action-btn { flex: 1; text-align: center; }
+    .stage-tag { width: 100%; margin-left: 0; order: -1; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">STAFF PORTAL</div>
+      <div class="centre-tag">Centre A — Ambala Cantt</div>
+    </div>
+    <div class="header-right">
+      <div class="staff-badge">
+        <div class="staff-avatar">RK</div>
+        <div>
+          <div class="staff-name">Ramesh Kumar</div>
+          <div class="staff-role">Centre Operator</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="subnav" id="subnav">
+    <a href="dashboard.html">Dashboard</a>
+    <span>/</span>
+    <a href="queue.html">Queue management</a>
+    <span>/</span>
+    <a href="status.html" class="current">Status management</a>
+    <span>/</span>
+    <a href="reports.html">Reports</a>
+  </div>
+
+  <main>
+    <div class="page-heading">
+      <div class="page-title">Procurement status management</div>
+      <div class="page-sub">Move each booking through checked-in, quality check, weighing, and acceptance.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Active bookings <span class="count-badge" id="activeCount">0</span></div>
+      <div id="activeList"></div>
+    </div>
+
+    <div class="section" id="attnSection" style="display:none;">
+      <div class="section-title">Needs attention <span class="count-badge attn" id="attnCount">0</span></div>
+      <div id="attnList"></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="issueModal">
+    <div class="modal-box">
+      <div class="modal-title">Flag an issue</div>
+      <div class="modal-sub" id="issueTokenLabel">This will pause the booking for supervisor review.</div>
+      <label for="issueReason">Reason</label>
+      <select id="issueReason">
+        <option value="Weighing discrepancy">Weighing discrepancy</option>
+        <option value="Quality below standard">Quality below standard</option>
+        <option value="Documentation mismatch">Documentation mismatch</option>
+        <option value="Farmer dispute">Farmer dispute</option>
+        <option value="Other">Other</option>
+      </select>
+      <label for="issueNote">Note (optional)</label>
+      <textarea id="issueNote" placeholder="Add any detail for the supervisor"></textarea>
+      <div class="modal-actions">
+        <button class="action-btn" id="issueCancel">Cancel</button>
+        <button class="action-btn danger-outline" id="issueConfirm">Flag issue</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('name')) {
+    document.querySelector('.staff-name').textContent = urlParams.get('name');
+    document.querySelector('.staff-role').textContent = urlParams.get('role') || 'Centre Operator';
+    document.querySelector('.staff-avatar').textContent = urlParams.get('initials') || 'RK';
+    document.querySelector('.centre-tag').textContent = urlParams.get('centre') || 'Centre A — Ambala Cantt';
+  }
+  if (window.location.search) {
+    document.querySelectorAll('#subnav a').forEach(a => {
+      if (!a.classList.contains('current')) a.href = a.getAttribute('href') + window.location.search;
+    });
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    window.location.href = 'login.html';
+  });
+
+  const STAGES = ['Checked-in', 'Quality check', 'Weighing', 'Accepted', 'Completed'];
+
+  let bookings = [
+    { id: 'A233', farmer: 'Suresh Yadav', produce: 'Wheat, 40 quintal', slot: '10:00 AM', stageIndex: 0 },
+    { id: 'A240', farmer: 'Kavita Devi', produce: 'Mustard, 12 quintal', slot: '10:15 AM', stageIndex: 1 },
+    { id: 'A227', farmer: 'Poonam Chauhan', produce: 'Wheat, 20 quintal', slot: '9:45 AM', stageIndex: 2 },
+    { id: 'A219', farmer: 'Deepak Rana', produce: 'Mustard, 30 quintal', slot: '9:30 AM', stageIndex: 3 }
+  ];
+
+  let attention = [
+    { id: 'A214', farmer: 'Manoj Singh', produce: 'Wheat, 25 quintal', reason: 'Payment not confirmed', note: 'Farmer says UPI failed twice.', stageIndex: 3 }
+  ];
+
+  function showToast(msg) {
+    const stack = document.getElementById('toastStack');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    stack.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 250);
+    }, 2600);
+  }
+
+  function render() {
+    document.getElementById('activeCount').textContent = bookings.length;
+    document.getElementById('attnCount').textContent = attention.length;
+    document.getElementById('attnSection').style.display = attention.length ? 'block' : 'none';
+
+    const activeList = document.getElementById('activeList');
+    activeList.innerHTML = '';
+    if (bookings.length === 0) {
+      activeList.innerHTML = '<div class="empty-row">No bookings currently in progress.</div>';
+    } else {
+      bookings.forEach(b => activeList.appendChild(renderBookingCard(b)));
+    }
+
+    const attnList = document.getElementById('attnList');
+    attnList.innerHTML = '';
+    attention.forEach(a => attnList.appendChild(renderAttnCard(a)));
+  }
+
+  function renderBookingCard(b) {
+    const card = document.createElement('div');
+    card.className = 'booking-card';
+
+    const top = document.createElement('div');
+    top.className = 'booking-top';
+    top.innerHTML = '<div><div class="booking-id">#' + b.id + '</div>' +
+      '<div class="booking-meta">' + b.farmer + ' · ' + b.produce + ' · Slot ' + b.slot + '</div></div>' +
+      '<div class="stage-tag">Stage ' + (b.stageIndex + 1) + ' of ' + STAGES.length + '</div>';
+
+    const stepper = document.createElement('div');
+    stepper.className = 'stepper';
+    STAGES.forEach((label, i) => {
+      const step = document.createElement('div');
+      step.className = 'step' + (i < b.stageIndex ? ' done' : i === b.stageIndex ? ' current' : '');
+      const line = document.createElement('div');
+      line.className = 'step-line';
+      const node = document.createElement('div');
+      node.className = 'step-node';
+      node.appendChild(document.createTextNode(i < b.stageIndex ? '✓' : String(i + 1)));
+      const lbl = document.createElement('div');
+      lbl.className = 'step-label';
+      lbl.textContent = label;
+      step.appendChild(line);
+      step.appendChild(node);
+      step.appendChild(lbl);
+      stepper.appendChild(step);
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'booking-actions';
+
+    const isLast = b.stageIndex === STAGES.length - 1;
+    const advanceBtn = document.createElement('button');
+    advanceBtn.className = 'action-btn primary';
+    advanceBtn.textContent = isLast ? 'Mark completed' : 'Advance to ' + STAGES[b.stageIndex + 1];
+    advanceBtn.onclick = () => advanceBooking(b.id);
+    actions.appendChild(advanceBtn);
+
+    if (!isLast) {
+      const issueBtn = document.createElement('button');
+      issueBtn.className = 'action-btn danger-outline';
+      issueBtn.textContent = 'Flag issue';
+      issueBtn.onclick = () => openIssueModal(b.id);
+      actions.appendChild(issueBtn);
+    }
+
+    card.appendChild(top);
+    card.appendChild(stepper);
+    card.appendChild(actions);
+    return card;
+  }
+
+  function renderAttnCard(a) {
+    const card = document.createElement('div');
+    card.className = 'attn-card';
+
+    const info = document.createElement('div');
+    info.className = 'attn-info';
+    info.innerHTML = '<div class="booking-id">#' + a.id + '</div>' +
+      '<div class="booking-meta">' + a.farmer + ' · ' + a.produce + '</div>' +
+      '<span class="attn-reason">' + a.reason + '</span>' +
+      (a.note ? '<div class="attn-note">' + a.note + '</div>' : '');
+
+    const actions = document.createElement('div');
+    actions.className = 'booking-actions';
+    const resumeBtn = document.createElement('button');
+    resumeBtn.className = 'action-btn primary';
+    resumeBtn.textContent = 'Resume workflow';
+    resumeBtn.onclick = () => resumeBooking(a.id);
+    actions.appendChild(resumeBtn);
+
+    card.appendChild(info);
+    card.appendChild(actions);
+    return card;
+  }
+
+  function advanceBooking(id) {
+    const b = bookings.find(x => x.id === id);
+    if (b.stageIndex === STAGES.length - 1) return;
+    b.stageIndex += 1;
+    if (b.stageIndex === STAGES.length - 1) {
+      showToast('Token #' + b.id + ' marked completed');
+      bookings = bookings.filter(x => x.id !== id);
+    } else {
+      showToast('Token #' + b.id + ' advanced to ' + STAGES[b.stageIndex]);
+    }
+    render();
+  }
+
+  let pendingIssueId = null;
+  function openIssueModal(id) {
+    pendingIssueId = id;
+    const b = bookings.find(x => x.id === id);
+    document.getElementById('issueTokenLabel').textContent = 'Flag token #' + b.id + ' (' + b.farmer + ') for supervisor review.';
+    document.getElementById('issueModal').classList.add('show');
+  }
+  document.getElementById('issueCancel').addEventListener('click', () => {
+    document.getElementById('issueModal').classList.remove('show');
+  });
+  document.getElementById('issueConfirm').addEventListener('click', () => {
+    const b = bookings.find(x => x.id === pendingIssueId);
+    const reason = document.getElementById('issueReason').value;
+    const note = document.getElementById('issueNote').value;
+    attention.push({ id: b.id, farmer: b.farmer, produce: b.produce, reason: reason, note: note, stageIndex: b.stageIndex });
+    bookings = bookings.filter(x => x.id !== pendingIssueId);
+    document.getElementById('issueModal').classList.remove('show');
+    document.getElementById('issueNote').value = '';
+    render();
+    showToast('Token #' + b.id + ' flagged — ' + reason);
+  });
+
+  function resumeBooking(id) {
+    const a = attention.find(x => x.id === id);
+    bookings.push({ id: a.id, farmer: a.farmer, produce: a.produce, slot: '—', stageIndex: a.stageIndex });
+    attention = attention.filter(x => x.id !== id);
+    render();
+    showToast('Token #' + a.id + ' returned to the active workflow');
+  }
+
+  render();
+</script>
+
+</body>
+</html>
