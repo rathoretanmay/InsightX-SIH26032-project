@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — SIH26032 Procurement Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E;
+    --green-700: #2D4A2B;
+    --green-500: #4C6E48;
+    --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7;
+    --gold: #C9962C;
+    --gold-dark: #9C7420;
+    --gold-bg: #FBF1DD;
+    --white: #FFFFFF;
+    --ink: #1E231E;
+    --ink-soft: #5A6156;
+    --border: #D6DCCE;
+    --danger: #B23A2E;
+    --danger-bg: #FBEAE7;
+    --success: #2D6A3E;
+    --radius: 10px;
+    --text-scale: 1;
+    --focus-ring: #1A5FB4;
+  }
+
+  /* High contrast overrides everything that matters for readability */
+  body.high-contrast {
+    --sage-bg: #FFFFFF;
+    --ink: #000000;
+    --ink-soft: #000000;
+    --border: #000000;
+    --green-100: #FFFFFF;
+    --green-700: #003300;
+    --green-900: #000000;
+    --gold-dark: #6B4E00;
+    --gold-bg: #FFFFFF;
+    --danger-bg: #FFFFFF;
+  }
+  body.high-contrast .booking-card, body.high-contrast .setting-card, body.high-contrast .panel, body.high-contrast .faq-item {
+    border-width: 2px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--sage-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* Reduced motion: kill all transitions/animations on request */
+  body.reduced-motion * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  header {
+    background: var(--green-700);
+    color: var(--white);
+    padding: 0 2rem;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--green-100); }
+  .centre-tag {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.65);
+    border-left: 1px solid rgba(255,255,255,0.25);
+    padding-left: 10px;
+    margin-left: 4px;
+  }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .staff-badge { display: flex; align-items: center; gap: 8px; }
+  .staff-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gold); color: var(--green-900);
+    font-size: 12.5px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .staff-name { font-size: 13.5px; font-weight: 500; }
+  .staff-role { font-size: 11.5px; color: rgba(255,255,255,0.6); }
+  .logout-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.3);
+    color: var(--white); font-size: 12.5px; font-family: 'Inter', sans-serif;
+    padding: 7px 13px; border-radius: 8px; cursor: pointer;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.08); }
+
+  .subnav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .subnav .current { color: var(--green-900); font-weight: 500; }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+  }
+
+  .page-heading { margin-bottom: 1.6rem; }
+  .page-title { font-family: 'Fraunces', serif; font-size: calc(1.6rem * var(--text-scale)); font-weight: 600; }
+  .page-sub { font-size: calc(13.5px * var(--text-scale)); color: var(--ink-soft); margin-top: 3px; }
+
+  .section { margin-bottom: 2rem; }
+  .section-title {
+    font-size: calc(14.5px * var(--text-scale));
+    font-weight: 600;
+    color: var(--green-900);
+    margin-bottom: 0.9rem;
+  }
+
+  .setting-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 10px;
+  }
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .setting-row + .setting-row {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .setting-label { font-size: calc(13.5px * var(--text-scale)); font-weight: 500; color: var(--ink); }
+  .setting-desc { font-size: calc(11.5px * var(--text-scale)); color: var(--ink-soft); margin-top: 3px; max-width: 420px; }
+
+  select.lang-select {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 11px;
+    font-family: 'Inter', sans-serif;
+    font-size: calc(13px * var(--text-scale));
+    background: var(--white);
+    color: var(--ink);
+  }
+
+  .size-toggle {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    overflow: hidden;
+  }
+  .size-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border: none;
+    background: var(--white);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+  }
+  .size-btn:last-child { border-right: none; }
+  .size-btn.active { background: var(--green-700); color: var(--white); }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--border);
+    border-radius: 24px;
+    transition: background 0.2s ease;
+  }
+  .slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: var(--white);
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+  .switch input:checked + .slider { background: var(--green-700); }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+  .switch input:focus-visible + .slider { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+
+  .faq-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .faq-question {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0.95rem 1.15rem;
+    font-family: 'Inter', sans-serif;
+    font-size: calc(13.5px * var(--text-scale));
+    font-weight: 500;
+    color: var(--green-900);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .faq-caret { font-size: 12px; color: var(--ink-soft); transition: transform 0.2s ease; flex-shrink: 0; }
+  .faq-item.open .faq-caret { transform: rotate(180deg); }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .faq-item.open .faq-answer { max-height: 220px; }
+  .faq-answer-inner {
+    padding: 0 1.15rem 1rem;
+    font-size: calc(12.5px * var(--text-scale));
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  .app-info-row { display: flex; justify-content: space-between; font-size: calc(12.5px * var(--text-scale)); padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .app-info-row:last-child { border-bottom: none; }
+  .app-info-label { color: var(--ink-soft); }
+  .app-info-value { color: var(--ink); font-weight: 500; }
+
+  .feedback-btn {
+    margin-top: 14px;
+    font-size: 12.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--green-700);
+    background: var(--green-700);
+    color: var(--white);
+    cursor: pointer;
+  }
+  .feedback-btn:hover { background: var(--green-900); }
+
+  .toast-stack { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 60; }
+  .toast {
+    background: var(--green-900); color: var(--white); font-size: 13px;
+    padding: 11px 16px; border-radius: 9px; box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    opacity: 0; transform: translateY(6px); transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 700px) {
+    header { padding: 0 1.25rem; }
+    .centre-tag { display: none; }
+    .subnav { padding: 0 1.25rem; }
+    main { padding: 1.5rem 1.25rem 3rem; }
+    .setting-row { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">STAFF PORTAL</div>
+      <div class="centre-tag">Centre A — Ambala Cantt</div>
+    </div>
+    <div class="header-right">
+      <div class="staff-badge">
+        <div class="staff-avatar">RK</div>
+        <div>
+          <div class="staff-name">Ramesh Kumar</div>
+          <div class="staff-role">Centre Operator</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="subnav">
+    <span>Dashboard</span>
+    <span>/</span>
+    <span>Queue management</span>
+    <span>/</span>
+    <span>Status management</span>
+    <span>/</span>
+    <span>Reports</span>
+    <span>/</span>
+    <span class="current" id="settingsCrumb">Settings</span>
+  </div>
+
+  <main>
+    <div class="page-heading">
+      <div class="page-title" id="pageTitle">Settings</div>
+      <div class="page-sub" id="pageSub">Language, display, notifications, and help — for this device only.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" id="langSectionTitle">Language</div>
+      <div class="setting-card">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label" id="langLabel">Display language</div>
+            <div class="setting-desc" id="langDesc">Changes the language used across the staff portal.</div>
+          </div>
+          <select class="lang-select" id="langSelect">
+            <option value="en">English</option>
+            <option value="hi">हिंदी (Hindi)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" id="displaySectionTitle">Display and accessibility</div>
+      <div class="setting-card">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label" id="fontLabel">Font size</div>
+            <div class="setting-desc" id="fontDesc">Adjusts text size across this portal.</div>
+          </div>
+          <div class="size-toggle" id="sizeToggle">
+            <button class="size-btn" data-scale="0.9">A-</button>
+            <button class="size-btn active" data-scale="1">A</button>
+            <button class="size-btn" data-scale="1.25">A+</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label" id="contrastLabel">High contrast</div>
+            <div class="setting-desc" id="contrastDesc">Increases color contrast for better visibility.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="contrastToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label" id="motionLabel">Reduced motion</div>
+            <div class="setting-desc" id="motionDesc">Turns off animations and transitions.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="motionToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" id="notifSectionTitle">Notification preferences</div>
+      <div class="setting-card">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Slot confirmations</div>
+            <div class="setting-desc">When a farmer's slot booking is confirmed or changed.</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Queue status changes</div>
+            <div class="setting-desc">When tokens are called, held, or escalated.</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Payment updates</div>
+            <div class="setting-desc">When a payment is completed or still pending.</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Centre announcements</div>
+            <div class="setting-desc">Closures, delays, and weather-related advisories.</div>
+          </div>
+          <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" id="faqSectionTitle">Help and FAQ</div>
+      <div id="faqList">
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>How do I call the next token in the queue?</span>
+            <span class="faq-caret">▾</span>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Go to Queue management and use the "Call next" button, or call a specific waiting token directly from its card.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What happens when I escalate a booking?</span>
+            <span class="faq-caret">▾</span>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">The booking moves to "Needs attention" with your selected reason and note, so a supervisor can review it before it continues.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Can I undo marking a booking as complete?</span>
+            <span class="faq-caret">▾</span>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Not from this screen. If a booking was completed by mistake, ask a supervisor to reopen it from the reports section.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Who can I contact if a counter goes offline?</span>
+            <span class="faq-caret">▾</span>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Report it to your centre supervisor immediately so bookings can be redirected to the remaining active counters.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">App information</div>
+      <div class="setting-card">
+        <div class="app-info-row"><span class="app-info-label">Portal</span><span class="app-info-value">SIH26032 Staff Procurement Portal</span></div>
+        <div class="app-info-row"><span class="app-info-label">Version</span><span class="app-info-value">1.0.0 (demo)</span></div>
+        <div class="app-info-row"><span class="app-info-label">Centre</span><span class="app-info-value">Centre A — Ambala Cantt</span></div>
+        <div class="app-info-row"><span class="app-info-label">Data mode</span><span class="app-info-value">Mock data, frontend-only</span></div>
+        <button class="feedback-btn" id="feedbackBtn">Send feedback</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+<script>
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    showToast('Logout is wired once this page is linked to the login flow');
+  });
+
+  function showToast(msg) {
+    const stack = document.getElementById('toastStack');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    stack.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 250);
+    }, 2600);
+  }
+
+  // Font size — actually rescales key text via a CSS custom property
+  const sizeButtons = document.querySelectorAll('.size-btn');
+  sizeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      sizeButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.documentElement.style.setProperty('--text-scale', btn.dataset.scale);
+      showToast('Font size updated');
+    });
+  });
+
+  // High contrast — actually swaps the color palette
+  document.getElementById('contrastToggle').addEventListener('change', (e) => {
+    document.body.classList.toggle('high-contrast', e.target.checked);
+    showToast(e.target.checked ? 'High contrast turned on' : 'High contrast turned off');
+  });
+
+  // Reduced motion — actually disables transitions/animations site-wide on this page
+  document.getElementById('motionToggle').addEventListener('change', (e) => {
+    document.body.classList.toggle('reduced-motion', e.target.checked);
+    showToast(e.target.checked ? 'Reduced motion turned on' : 'Reduced motion turned off');
+  });
+
+  // Language — actually swaps key labels between English and Hindi
+  const TRANSLATIONS = {
+    en: {
+      crumb: 'Settings', title: 'Settings', sub: 'Language, display, notifications, and help — for this device only.',
+      langSection: 'Language', langLabel: 'Display language', langDesc: 'Changes the language used across the staff portal.',
+      displaySection: 'Display and accessibility', fontLabel: 'Font size', fontDesc: 'Adjusts text size across this portal.',
+      contrastLabel: 'High contrast', contrastDesc: 'Increases color contrast for better visibility.',
+      motionLabel: 'Reduced motion', motionDesc: 'Turns off animations and transitions.',
+      notifSection: 'Notification preferences', faqSection: 'Help and FAQ'
+    },
+    hi: {
+      crumb: 'सेटिंग्स', title: 'सेटिंग्स', sub: 'भाषा, डिस्प्ले, सूचनाएं और सहायता — केवल इस डिवाइस के लिए।',
+      langSection: 'भाषा', langLabel: 'डिस्प्ले भाषा', langDesc: 'स्टाफ पोर्टल में इस्तेमाल होने वाली भाषा बदलता है।',
+      displaySection: 'डिस्प्ले और सुगमता', fontLabel: 'फ़ॉन्ट आकार', fontDesc: 'इस पोर्टल में टेक्स्ट का आकार समायोजित करता है।',
+      contrastLabel: 'हाई कॉन्ट्रास्ट', contrastDesc: 'बेहतर दृश्यता के लिए रंग कंट्रास्ट बढ़ाता है।',
+      motionLabel: 'कम गति', motionDesc: 'एनिमेशन और ट्रांज़िशन बंद करता है।',
+      notifSection: 'सूचना प्राथमिकताएं', faqSection: 'सहायता और सामान्य प्रश्न'
+    }
+  };
+
+  document.getElementById('langSelect').addEventListener('change', (e) => {
+    const t = TRANSLATIONS[e.target.value];
+    document.getElementById('settingsCrumb').textContent = t.crumb;
+    document.getElementById('pageTitle').textContent = t.title;
+    document.getElementById('pageSub').textContent = t.sub;
+    document.getElementById('langSectionTitle').textContent = t.langSection;
+    document.getElementById('langLabel').textContent = t.langLabel;
+    document.getElementById('langDesc').textContent = t.langDesc;
+    document.getElementById('displaySectionTitle').textContent = t.displaySection;
+    document.getElementById('fontLabel').textContent = t.fontLabel;
+    document.getElementById('fontDesc').textContent = t.fontDesc;
+    document.getElementById('contrastLabel').textContent = t.contrastLabel;
+    document.getElementById('contrastDesc').textContent = t.contrastDesc;
+    document.getElementById('motionLabel').textContent = t.motionLabel;
+    document.getElementById('motionDesc').textContent = t.motionDesc;
+    document.getElementById('notifSectionTitle').textContent = t.notifSection;
+    document.getElementById('faqSectionTitle').textContent = t.faqSection;
+    showToast(e.target.value === 'hi' ? 'भाषा बदल दी गई' : 'Language updated');
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-question').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.closest('.faq-item');
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+
+  document.getElementById('feedbackBtn').addEventListener('click', () => {
+    showToast('Feedback form is a demo — nothing is sent yet');
+  });
+</script>
+
+</body>
+</html>
