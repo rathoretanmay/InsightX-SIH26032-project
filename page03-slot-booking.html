@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Slot — Procurement Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E;
+    --green-700: #2D4A2B;
+    --green-500: #4C6E48;
+    --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7;
+    --gold: #C9962C;
+    --gold-dark: #9C7420;
+    --gold-bg: #FBF1DD;
+    --white: #FFFFFF;
+    --ink: #1E231E;
+    --ink-soft: #5A6156;
+    --border: #D6DCCE;
+    --danger: #B23A2E;
+    --danger-bg: #FBEAE7;
+    --success: #2D6A3E;
+    --success-bg: #E2F1E4;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--sage-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2rem;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--green-900); }
+  .back-link { font-size: 13px; color: var(--ink-soft); text-decoration: none; }
+
+  main { max-width: 760px; margin: 0 auto; padding: 0.5rem 1.5rem 5rem; }
+
+  .page-title { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 1.3rem; }
+
+  .stepper-nav {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.7rem;
+  }
+  .step-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .step-nav-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--border); color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11.5px; font-weight: 600; z-index: 1;
+  }
+  .step-nav-item.done .step-nav-dot { background: var(--green-700); color: var(--white); }
+  .step-nav-item.current .step-nav-dot { background: var(--white); color: var(--green-700); border: 2px solid var(--green-700); }
+  .step-nav-line { position: absolute; top: 12px; left: -50%; width: 100%; height: 2px; background: var(--border); z-index: 0; }
+  .step-nav-item:first-child .step-nav-line { display: none; }
+  .step-nav-item.done .step-nav-line { background: var(--green-700); }
+  .step-nav-label { font-size: 10.5px; color: var(--ink-soft); margin-top: 6px; text-align: center; }
+  .step-nav-item.done .step-nav-label, .step-nav-item.current .step-nav-label { color: var(--green-900); font-weight: 500; }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  .section-label { font-size: 13.5px; font-weight: 600; color: var(--green-900); margin-bottom: 0.9rem; }
+
+  .centre-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .centre-card.selected { border-color: var(--green-700); background: var(--green-100); }
+  .centre-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .centre-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem; color: var(--green-900); }
+  .centre-addr { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .centre-meta { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--ink-soft); }
+  .capacity-badge { font-size: 10.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .capacity-badge.available { background: var(--success-bg); color: var(--success); }
+  .capacity-badge.almost { background: var(--gold-bg); color: var(--gold-dark); }
+  .capacity-badge.full { background: var(--danger-bg); color: var(--danger); }
+
+  .date-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 1.4rem; }
+  .date-chip {
+    flex-shrink: 0;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-align: center;
+    cursor: pointer;
+    min-width: 66px;
+  }
+  .date-chip.selected { border-color: var(--green-700); background: var(--green-700); color: var(--white); }
+  .date-chip-day { font-size: 10.5px; opacity: 0.8; }
+  .date-chip-date { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1rem; margin-top: 2px; }
+
+  .slot-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  .slot-card.selected { border-color: var(--green-700); background: var(--green-100); }
+  .slot-card.disabled { opacity: 0.55; cursor: not-allowed; }
+  .slot-time { font-weight: 600; font-size: 14px; color: var(--green-900); }
+  .slot-wait { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+
+  .field-group { margin-bottom: 1.1rem; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--green-900); margin-bottom: 6px; }
+  input, select {
+    width: 100%;
+    padding: 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    background: var(--white);
+    outline: none;
+  }
+  input:focus, select:focus { border-color: var(--green-700); box-shadow: 0 0 0 3px rgba(45,74,43,0.12); }
+  input.invalid { border-color: var(--danger); }
+  .error-text { display: none; font-size: 12.5px; color: var(--danger); margin-top: 5px; }
+  .error-text.show { display: block; }
+
+  .review-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.3rem;
+    margin-bottom: 1rem;
+  }
+  .review-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .review-row:last-child { border-bottom: none; }
+  .review-label { color: var(--ink-soft); }
+  .review-value { color: var(--ink); font-weight: 500; }
+
+  .nav-buttons { display: flex; gap: 10px; margin-top: 1.5rem; }
+  .btn { flex: 1; padding: 14px; border-radius: 10px; font-size: 14.5px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; }
+  .btn-primary { background: var(--green-700); color: var(--white); }
+  .btn-primary:hover { background: var(--green-900); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { background: var(--white); color: var(--ink); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--green-500); }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(30,35,30,0.45);
+    align-items: center; justify-content: center; z-index: 50; padding: 1.5rem;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box { background: var(--white); border-radius: 14px; padding: 1.6rem; max-width: 380px; width: 100%; }
+  .modal-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+  .modal-sub { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 1.2rem; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 1.2rem; }
+
+  .success-view { display: none; text-align: center; padding: 2.5rem 1rem; }
+  .success-view.show { display: block; }
+  .success-icon {
+    width: 60px; height: 60px; border-radius: 50%; background: var(--success-bg); color: var(--success);
+    font-size: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem;
+  }
+  .success-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 8px; }
+  .success-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 1.5rem; }
+  .success-token { display: inline-block; background: var(--gold-bg); color: var(--gold-dark); font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.3rem; padding: 10px 22px; border-radius: 10px; margin-bottom: 1.5rem; }
+
+  @media (max-width: 500px) {
+    .topbar { padding: 1rem 1.25rem; }
+    main { padding: 0.5rem 1.1rem 4rem; }
+    .step-nav-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span>🌾</span><span class="brand-mark">Harvest Link</span></div>
+    <a href="#" class="back-link">← Back home</a>
+  </div>
+
+  <main>
+    <div id="wizardView">
+      <div class="page-title">Book a procurement slot</div>
+
+      <div class="stepper-nav" id="stepperNav"></div>
+
+      <div class="step-panel active" data-step="0">
+        <div class="section-label">Choose a procurement centre</div>
+        <div id="centreList"></div>
+      </div>
+
+      <div class="step-panel" data-step="1">
+        <div class="section-label">Choose a date</div>
+        <div class="date-scroll" id="dateScroll"></div>
+        <div class="section-label">Available time slots</div>
+        <div id="slotList"></div>
+      </div>
+
+      <div class="step-panel" data-step="2">
+        <div class="section-label">Produce details</div>
+        <div class="field-group">
+          <label for="crop">Crop / produce type</label>
+          <select id="crop">
+            <option value="">Select crop</option>
+            <option value="Wheat">Wheat</option>
+            <option value="Mustard">Mustard</option>
+            <option value="Paddy">Paddy</option>
+          </select>
+          <div class="error-text" id="cropError">Please select your crop type</div>
+        </div>
+        <div class="field-group">
+          <label for="quantity">Quantity (quintal)</label>
+          <input type="number" id="quantity" placeholder="e.g. 25">
+          <div class="error-text" id="quantityError">Enter your expected quantity</div>
+        </div>
+      </div>
+
+      <div class="step-panel" data-step="3">
+        <div class="section-label">Review your booking</div>
+        <div class="review-card">
+          <div class="review-row"><span class="review-label">Centre</span><span class="review-value" id="reviewCentre">—</span></div>
+          <div class="review-row"><span class="review-label">Date</span><span class="review-value" id="reviewDate">—</span></div>
+          <div class="review-row"><span class="review-label">Time slot</span><span class="review-value" id="reviewSlot">—</span></div>
+          <div class="review-row"><span class="review-label">Crop</span><span class="review-value" id="reviewCrop">—</span></div>
+          <div class="review-row"><span class="review-label">Quantity</span><span class="review-value" id="reviewQuantity">—</span></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="backBtn">Back</button>
+        <button class="btn btn-primary" id="nextBtn">Continue</button>
+      </div>
+    </div>
+
+    <div class="success-view" id="successView">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Slot booked!</div>
+      <div class="success-sub">Your token has been generated. Show this at the centre.</div>
+      <div class="success-token" id="successToken">#A252</div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="doneBtn">Back to home</button>
+        <button class="btn btn-primary" id="viewTokenBtn">View my token</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <div class="modal-title">Confirm this booking?</div>
+      <div class="modal-sub" id="confirmSub">Once confirmed, you'll receive a token for this slot.</div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalConfirm">Confirm booking</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const STEP_LABELS = ['Centre', 'Date & slot', 'Produce', 'Review'];
+  let currentStep = 0;
+  let selectedCentre = null;
+  let selectedDate = null;
+  let selectedSlot = null;
+
+  const CENTRES = [
+    { id: 'Centre A', name: 'Centre A — Ambala Cantt', addr: '2.4 km away · Grain Market Road', available: 14, wait: '18 min', status: 'available' },
+    { id: 'Centre B', name: 'Centre B — Yamunanagar', addr: '11 km away · Mandi Complex', available: 4, wait: '35 min', status: 'almost' },
+    { id: 'Centre C', name: 'Centre C — Kurukshetra', addr: '19 km away · New Grain Yard', available: 0, wait: '—', status: 'full' }
+  ];
+
+  const SLOTS_BY_CENTRE = {
+    'Centre A': [
+      { time: '9:00 – 9:30 AM', wait: '~10 min', status: 'available' },
+      { time: '10:00 – 10:30 AM', wait: '~18 min', status: 'available' },
+      { time: '11:00 – 11:30 AM', wait: '~30 min', status: 'almost' },
+      { time: '12:00 – 12:30 PM', wait: '—', status: 'full' }
+    ],
+    'Centre B': [
+      { time: '9:00 – 9:30 AM', wait: '~35 min', status: 'almost' },
+      { time: '10:00 – 10:30 AM', wait: '—', status: 'full' }
+    ],
+    'Centre C': [
+      { time: '9:00 – 9:30 AM', wait: '—', status: 'full' }
+    ]
+  };
+
+  function renderStepperNav() {
+    const nav = document.getElementById('stepperNav');
+    nav.innerHTML = '';
+    STEP_LABELS.forEach((label, i) => {
+      const item = document.createElement('div');
+      item.className = 'step-nav-item' + (i < currentStep ? ' done' : i === currentStep ? ' current' : '');
+      const line = document.createElement('div');
+      line.className = 'step-nav-line';
+      const dot = document.createElement('div');
+      dot.className = 'step-nav-dot';
+      dot.appendChild(document.createTextNode(i < currentStep ? '✓' : String(i + 1)));
+      const lbl = document.createElement('div');
+      lbl.className = 'step-nav-label';
+      lbl.textContent = label;
+      item.appendChild(line);
+      item.appendChild(dot);
+      item.appendChild(lbl);
+      nav.appendChild(item);
+    });
+  }
+
+  function badgeClass(status) { return status; }
+  function badgeLabel(status) { return status === 'available' ? 'Available' : status === 'almost' ? 'Almost full' : 'Full'; }
+
+  function renderCentres() {
+    const list = document.getElementById('centreList');
+    list.innerHTML = '';
+    CENTRES.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'centre-card' + (selectedCentre === c.id ? ' selected' : '');
+      card.innerHTML = '<div class="centre-top"><div><div class="centre-name">' + c.name + '</div><div class="centre-addr">' + c.addr + '</div></div>' +
+        '<span class="capacity-badge ' + badgeClass(c.status) + '">' + badgeLabel(c.status) + '</span></div>' +
+        '<div class="centre-meta"><span>' + c.available + ' slots open today</span><span>Avg wait ' + c.wait + '</span></div>';
+      if (c.status !== 'full') {
+        card.addEventListener('click', () => {
+          selectedCentre = c.id;
+          selectedSlot = null;
+          renderCentres();
+        });
+      } else {
+        card.style.opacity = '0.6';
+        card.style.cursor = 'not-allowed';
+      }
+      list.appendChild(card);
+    });
+  }
+
+  function renderDates() {
+    const scroll = document.getElementById('dateScroll');
+    scroll.innerHTML = '';
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const today = new Date();
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const chip = document.createElement('div');
+      chip.className = 'date-chip' + (selectedDate === i ? ' selected' : '');
+      const label = i === 0 ? 'Today' : i === 1 ? 'Tmrw' : days[d.getDay()];
+      chip.innerHTML = '<div class="date-chip-day">' + label + '</div><div class="date-chip-date">' + d.getDate() + '</div>';
+      chip.addEventListener('click', () => { selectedDate = i; selectedSlot = null; renderDates(); renderSlots(); });
+      scroll.appendChild(chip);
+    }
+  }
+
+  function renderSlots() {
+    const list = document.getElementById('slotList');
+    list.innerHTML = '';
+    if (selectedDate === null || !selectedCentre) {
+      list.innerHTML = '<div style="font-size:13px;color:var(--ink-soft);">Select a date to see available slots.</div>';
+      return;
+    }
+    const slots = SLOTS_BY_CENTRE[selectedCentre] || [];
+    slots.forEach((s, i) => {
+      const card = document.createElement('div');
+      card.className = 'slot-card' + (selectedSlot === i ? ' selected' : '') + (s.status === 'full' ? ' disabled' : '');
+      card.innerHTML = '<div><div class="slot-time">' + s.time + '</div><div class="slot-wait">Expected wait ' + s.wait + '</div></div>' +
+        '<span class="capacity-badge ' + badgeClass(s.status) + '">' + badgeLabel(s.status) + '</span>';
+      if (s.status !== 'full') {
+        card.addEventListener('click', () => { selectedSlot = i; renderSlots(); });
+      }
+      list.appendChild(card);
+    });
+  }
+
+  function showStep(step) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('.step-panel[data-step="' + step + '"]').classList.add('active');
+    document.getElementById('backBtn').style.visibility = step === 0 ? 'hidden' : 'visible';
+    document.getElementById('nextBtn').textContent = step === 3 ? 'Confirm booking' : 'Continue';
+    renderStepperNav();
+  }
+
+  function validateStep(step) {
+    if (step === 0) {
+      if (!selectedCentre) { alert('Please select a procurement centre'); return false; }
+      return true;
+    }
+    if (step === 1) {
+      if (selectedDate === null || selectedSlot === null) { alert('Please select a date and time slot'); return false; }
+      return true;
+    }
+    if (step === 2) {
+      const crop = document.getElementById('crop');
+      const qty = document.getElementById('quantity');
+      let ok = true;
+      document.getElementById('cropError').classList.toggle('show', !crop.value);
+      crop.classList.toggle('invalid', !crop.value);
+      if (!crop.value) ok = false;
+      document.getElementById('quantityError').classList.toggle('show', !qty.value);
+      qty.classList.toggle('invalid', !qty.value);
+      if (!qty.value) ok = false;
+      return ok;
+    }
+    return true;
+  }
+
+  function fillReview() {
+    const centre = CENTRES.find(c => c.id === selectedCentre);
+    const slot = SLOTS_BY_CENTRE[selectedCentre][selectedSlot];
+    const dateLabel = selectedDate === 0 ? 'Today' : selectedDate === 1 ? 'Tomorrow' : 'In ' + selectedDate + ' days';
+    document.getElementById('reviewCentre').textContent = centre.name;
+    document.getElementById('reviewDate').textContent = dateLabel;
+    document.getElementById('reviewSlot').textContent = slot.time;
+    document.getElementById('reviewCrop').textContent = document.getElementById('crop').value;
+    document.getElementById('reviewQuantity').textContent = document.getElementById('quantity').value + ' quintal';
+    document.getElementById('confirmSub').textContent = 'Booking ' + slot.time + ' at ' + centre.name + ' for ' + document.getElementById('quantity').value + ' quintal of ' + document.getElementById('crop').value + '.';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (!validateStep(currentStep)) return;
+    if (currentStep === 3) {
+      fillReview();
+      document.getElementById('confirmModal').classList.add('show');
+      return;
+    }
+    currentStep++;
+    if (currentStep === 1) { renderDates(); renderSlots(); }
+    showStep(currentStep);
+  });
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    if (currentStep === 0) return;
+    currentStep--;
+    showStep(currentStep);
+  });
+
+  document.getElementById('modalCancel').addEventListener('click', () => {
+    document.getElementById('confirmModal').classList.remove('show');
+  });
+
+  document.getElementById('modalConfirm').addEventListener('click', () => {
+    document.getElementById('confirmModal').classList.remove('show');
+    document.getElementById('wizardView').style.display = 'none';
+    document.getElementById('successView').classList.add('show');
+  });
+
+  document.getElementById('doneBtn').addEventListener('click', () => {
+    alert('This connects to the home/landing page once the flow is linked.');
+  });
+  document.getElementById('viewTokenBtn').addEventListener('click', () => {
+    alert('This connects to the "Booking confirmation / token" page once the flow is linked.');
+  });
+
+  renderCentres();
+  showStep(currentStep);
+</script>
+
+</body>
+</html>

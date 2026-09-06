@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Procurement Status — Procurement Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E;
+    --green-700: #2D4A2B;
+    --green-500: #4C6E48;
+    --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7;
+    --gold: #C9962C;
+    --gold-dark: #9C7420;
+    --gold-bg: #FBF1DD;
+    --white: #FFFFFF;
+    --ink: #1E231E;
+    --ink-soft: #5A6156;
+    --border: #D6DCCE;
+    --danger: #B23A2E;
+    --danger-bg: #FBEAE7;
+    --success: #2D6A3E;
+    --success-bg: #E2F1E4;
+    --grey-bg: #EEEEEC;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--sage-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2rem;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--green-900); }
+  .back-link { font-size: 13px; color: var(--ink-soft); text-decoration: none; }
+
+  main { max-width: 620px; margin: 0 auto; padding: 0.5rem 1.5rem 4rem; }
+
+  .demo-toggle { display: flex; gap: 8px; margin-bottom: 1.4rem; justify-content: center; }
+  .demo-toggle button {
+    font-size: 12px; font-family: 'Inter', sans-serif; padding: 6px 12px;
+    border-radius: 7px; border: 1px solid var(--border); background: var(--white);
+    color: var(--ink-soft); cursor: pointer;
+  }
+  .demo-toggle button.active { background: var(--green-900); color: var(--white); border-color: var(--green-900); }
+
+  .status-view { display: none; }
+  .status-view.show { display: block; }
+
+  .booking-summary {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.3rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .booking-centre { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 600; color: var(--green-900); }
+  .booking-meta { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; }
+  .token-chip { background: var(--gold-bg); color: var(--gold-dark); font-family: 'Fraunces', serif; font-weight: 600; font-size: 0.95rem; padding: 6px 13px; border-radius: 8px; }
+
+  .queue-callout {
+    background: var(--green-700);
+    color: var(--white);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+  .queue-callout-text { font-size: 13px; color: var(--green-100); }
+  .queue-callout-num { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 700; }
+  .queue-callout-wait { font-size: 12px; color: var(--green-100); margin-top: 2px; }
+
+  .timeline { position: relative; padding-left: 6px; }
+  .timeline-item { display: flex; gap: 16px; position: relative; padding-bottom: 1.7rem; }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-marker { position: relative; display: flex; flex-direction: column; align-items: center; }
+  .timeline-line {
+    position: absolute;
+    top: 34px;
+    bottom: -1.7rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item:last-child .timeline-line { display: none; }
+  .timeline-item.done .timeline-line { background: var(--green-700); }
+  .timeline-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--grey-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .timeline-item.done .timeline-icon { background: var(--green-700); color: var(--white); }
+  .timeline-item.current .timeline-icon { background: var(--gold); color: var(--green-900); }
+  .timeline-content { padding-top: 4px; }
+  .timeline-label { font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+  .timeline-item.done .timeline-label, .timeline-item.current .timeline-label { color: var(--green-900); }
+  .timeline-time { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .timeline-desc { font-size: 12.5px; color: var(--ink-soft); margin-top: 5px; line-height: 1.5; max-width: 380px; }
+  .timeline-item.current .timeline-desc { color: var(--ink); }
+
+  .payment-pill { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 2px 9px; border-radius: 20px; margin-top: 5px; }
+  .payment-pill.pending { background: var(--gold-bg); color: var(--gold-dark); }
+  .payment-pill.paid { background: var(--success-bg); color: var(--success); }
+
+  .empty-state, .error-state {
+    display: none;
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--white);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+  .empty-state.show, .error-state.show { display: block; }
+  .empty-icon, .error-icon { font-size: 34px; margin-bottom: 12px; }
+  .empty-title, .error-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
+  .empty-sub, .error-sub { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 1.3rem; }
+
+  .btn {
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border: none;
+    background: var(--green-700);
+    color: var(--white);
+  }
+  .btn:hover { background: var(--green-900); }
+  .btn.outline { background: var(--white); color: var(--green-700); border: 1.5px solid var(--green-700); }
+
+  @media (max-width: 480px) {
+    .topbar { padding: 1rem 1.25rem; }
+    main { padding: 0.5rem 1.1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span>🌾</span><span class="brand-mark">Harvest Link</span></div>
+    <a href="#" class="back-link">← Back home</a>
+  </div>
+
+  <main>
+    <div class="demo-toggle">
+      <button class="active" id="btnNormal">Has booking</button>
+      <button id="btnEmpty">No booking</button>
+      <button id="btnError">Error state</button>
+    </div>
+
+    <div class="status-view show" id="normalView">
+      <div class="booking-summary">
+        <div>
+          <div class="booking-centre">Centre A — Ambala Cantt</div>
+          <div class="booking-meta">Wheat, 25 quintal · Slot 10:00 – 10:30 AM</div>
+        </div>
+        <div class="token-chip">#A245</div>
+      </div>
+
+      <div class="queue-callout" id="queueCallout">
+        <div>
+          <div class="queue-callout-text">Your position in queue</div>
+          <div class="queue-callout-wait" id="queueWaitText">Estimated wait ~18 min</div>
+        </div>
+        <div class="queue-callout-num" id="queueNum">3</div>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">No active booking</div>
+      <div class="empty-sub">You don't have a procurement slot booked right now.</div>
+      <button class="btn" id="bookFromEmpty">Book a slot</button>
+    </div>
+
+    <div class="error-state" id="errorState">
+      <div class="error-icon">⚠️</div>
+      <div class="error-title">Couldn't load your status</div>
+      <div class="error-sub">Check your internet connection and try again.</div>
+      <button class="btn outline" id="retryBtn">Retry</button>
+    </div>
+  </main>
+
+<script>
+  const STAGES = [
+    { key: 'booked', label: 'Booked', icon: '📅', desc: 'Your slot at Centre A was confirmed and a token was issued.' },
+    { key: 'checkedin', label: 'Checked-in', icon: '🧾', desc: 'You have arrived and checked in at the centre.' },
+    { key: 'waiting', label: 'Waiting', icon: '⏳', desc: 'You are in the queue, waiting for your turn.' },
+    { key: 'quality', label: 'Quality check', icon: '🔍', desc: 'Your produce is being checked for quality.' },
+    { key: 'weighing', label: 'Weighing', icon: '⚖️', desc: 'Your produce is being weighed at the counter.' },
+    { key: 'complete', label: 'Procurement complete', icon: '✅', desc: 'Your produce has been procured successfully.' },
+    { key: 'payment', label: 'Payment', icon: '💰', desc: 'Your payment is being processed.' }
+  ];
+
+  const TIMESTAMPS = {
+    booked: 'Yesterday, 6:41 PM',
+    checkedin: 'Today, 9:52 AM',
+    waiting: 'Today, 9:55 AM'
+  };
+
+  const currentStageIndex = 2; // Waiting
+  const paymentStatus = 'pending'; // or 'paid'
+
+  function renderTimeline() {
+    const timeline = document.getElementById('timeline');
+    timeline.innerHTML = '';
+    STAGES.forEach((stage, i) => {
+      const item = document.createElement('div');
+      item.className = 'timeline-item' + (i < currentStageIndex ? ' done' : i === currentStageIndex ? ' current' : '');
+
+      const marker = document.createElement('div');
+      marker.className = 'timeline-marker';
+      const line = document.createElement('div');
+      line.className = 'timeline-line';
+      const icon = document.createElement('div');
+      icon.className = 'timeline-icon';
+      icon.textContent = i < currentStageIndex ? '✓' : stage.icon;
+      marker.appendChild(line);
+      marker.appendChild(icon);
+
+      const content = document.createElement('div');
+      content.className = 'timeline-content';
+      let html = '<div class="timeline-label">' + stage.label + '</div>';
+      if (TIMESTAMPS[stage.key] && i <= currentStageIndex) {
+        html += '<div class="timeline-time">' + TIMESTAMPS[stage.key] + '</div>';
+      }
+      html += '<div class="timeline-desc">' + stage.desc + '</div>';
+      if (stage.key === 'payment' && i === currentStageIndex) {
+        html += '<span class="payment-pill ' + paymentStatus + '">' + (paymentStatus === 'paid' ? 'Paid' : 'Pending') + '</span>';
+      }
+      content.innerHTML = html;
+
+      item.appendChild(marker);
+      item.appendChild(content);
+      timeline.appendChild(item);
+    });
+  }
+
+  const btnNormal = document.getElementById('btnNormal');
+  const btnEmpty = document.getElementById('btnEmpty');
+  const btnError = document.getElementById('btnError');
+  const normalView = document.getElementById('normalView');
+  const emptyState = document.getElementById('emptyState');
+  const errorState = document.getElementById('errorState');
+
+  function setActiveBtn(btn) {
+    [btnNormal, btnEmpty, btnError].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function showView(view) {
+    normalView.classList.remove('show');
+    emptyState.classList.remove('show');
+    errorState.classList.remove('show');
+    if (view === 'normal') normalView.classList.add('show');
+    if (view === 'empty') emptyState.classList.add('show');
+    if (view === 'error') errorState.classList.add('show');
+  }
+
+  btnNormal.addEventListener('click', () => { setActiveBtn(btnNormal); showView('normal'); });
+  btnEmpty.addEventListener('click', () => { setActiveBtn(btnEmpty); showView('empty'); });
+  btnError.addEventListener('click', () => { setActiveBtn(btnError); showView('error'); });
+
+  document.getElementById('bookFromEmpty').addEventListener('click', () => alert('This connects to the "Slot booking" page once the flow is linked.'));
+  document.getElementById('retryBtn').addEventListener('click', () => { setActiveBtn(btnNormal); showView('normal'); });
+
+  renderTimeline();
+</script>
+
+</body>
+</html>

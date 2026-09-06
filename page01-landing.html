@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procurement Portal — Book Your Slot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E;
+    --green-700: #2D4A2B;
+    --green-500: #4C6E48;
+    --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7;
+    --gold: #C9962C;
+    --gold-dark: #9C7420;
+    --gold-bg: #FBF1DD;
+    --white: #FFFFFF;
+    --ink: #1E231E;
+    --ink-soft: #5A6156;
+    --border: #D6DCCE;
+    --danger: #B23A2E;
+    --danger-bg: #FBEAE7;
+    --success: #2D6A3E;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--sage-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--green-900); }
+  .brand-icon { font-size: 20px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .lang-select {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    background: var(--white);
+    color: var(--ink);
+  }
+  .login-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--green-700);
+    text-decoration: none;
+    border: 1.5px solid var(--green-700);
+    padding: 7px 14px;
+    border-radius: 8px;
+  }
+  .login-link:hover { background: var(--green-100); }
+
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 3rem;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--green-700);
+    background: var(--green-100);
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 1.1rem;
+  }
+
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1.18;
+    color: var(--green-900);
+    margin-bottom: 1rem;
+  }
+
+  .hero-sub {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 1.6rem;
+    max-width: 460px;
+  }
+
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1.4rem; }
+  .cta-primary {
+    background: var(--green-700);
+    color: var(--white);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 14px 26px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cta-primary:hover { background: var(--green-900); }
+  .cta-secondary {
+    background: var(--white);
+    color: var(--green-900);
+    border: 1.5px solid var(--border);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .cta-secondary:hover { border-color: var(--green-500); }
+
+  .hero-note { font-size: 12.5px; color: var(--ink-soft); }
+
+  .hero-visual {
+    background: var(--green-700);
+    border-radius: 18px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .hero-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(115deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 42px);
+  }
+  .hero-visual-icon { font-size: 70px; margin-bottom: 1rem; position: relative; z-index: 1; }
+  .hero-visual-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    color: var(--white);
+    position: relative;
+    z-index: 1;
+  }
+  .hero-visual-card-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+  .hero-visual-card-sub { font-size: 12.5px; color: var(--green-100); }
+
+  .search-bar {
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+    padding: 0 2rem;
+  }
+  .search-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .search-icon { font-size: 18px; color: var(--ink-soft); }
+  .search-input {
+    flex: 1;
+    min-width: 180px;
+    border: none;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    background: transparent;
+  }
+  .search-btn {
+    background: var(--green-700);
+    color: var(--white);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .search-btn:hover { background: var(--green-900); }
+
+  .features {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+  }
+  .features-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--green-900);
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .feature-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.4rem;
+    text-align: center;
+  }
+  .feature-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--gold-bg);
+    color: var(--gold-dark);
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+  .feature-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; color: var(--green-900); }
+  .feature-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 12px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--border);
+  }
+
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--sage-bg);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-spinner {
+    width: 34px; height: 34px;
+    border: 3px solid var(--green-100);
+    border-top-color: var(--green-700);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 850px) {
+    .hero { grid-template-columns: 1fr; padding: 1.75rem 1.25rem 2rem; }
+    .hero-visual { min-height: 220px; order: -1; }
+    .hero-title { font-size: 1.9rem; }
+    .topbar { padding: 1rem 1.25rem; flex-wrap: wrap; gap: 10px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .search-bar { padding: 0 1.25rem; }
+    .features { padding: 0 1.25rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🌾</span>
+      <span class="brand-mark">Harvest Link</span>
+    </div>
+    <div class="topbar-right">
+      <select class="lang-select" id="langSelect">
+        <option value="en">English</option>
+        <option value="hi">हिंदी</option>
+      </select>
+      <a href="#" class="login-link" onclick="return goStaff()">Staff login</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-copy">
+      <span class="hero-eyebrow">SIH26032 · Procurement made simple</span>
+      <h1 class="hero-title">Book your procurement slot. Skip the wait.</h1>
+      <p class="hero-sub">No more standing in line for hours without knowing when your turn will come. Book a slot, get a token, and track your status — all from your phone.</p>
+      <div class="hero-ctas">
+        <button class="cta-primary" id="startBookingBtn">Start booking →</button>
+        <button class="cta-secondary" id="checkStatusBtn">Check my status</button>
+      </div>
+      <div class="hero-note">Already have a token? Use "Check my status" to see your queue position.</div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-visual-icon">🚜</div>
+      <div class="hero-visual-card">
+        <div class="hero-visual-card-title">Token #A245 confirmed</div>
+        <div class="hero-visual-card-sub">Centre A · Today, 10:00 AM · Position 3 in queue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <div class="search-box">
+      <span class="search-icon">📍</span>
+      <input type="text" class="search-input" placeholder="Search your nearest procurement centre — village, district or centre name">
+      <button class="search-btn" id="searchCentreBtn">Find centre</button>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="features-title">How it works</div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <div class="feature-title">Register once</div>
+        <div class="feature-desc">Add your details and preferred procurement centre — takes less than two minutes.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">Book a slot</div>
+        <div class="feature-desc">Pick a centre, date, and time that works for you. Get an instant digital token.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Track your status</div>
+        <div class="feature-desc">See your live queue position and procurement status — no need to call or ask around.</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    SIH26032 · Farmer Procurement Portal — a project for smoother, fairer procurement.
+  </footer>
+
+<script>
+  function showLoadingThenAlert(destination) {
+    const overlay = document.getElementById('loadingOverlay');
+    overlay.classList.add('show');
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      alert('This connects to the "' + destination + '" page once the flow is linked.');
+    }, 600);
+  }
+
+  document.getElementById('startBookingBtn').addEventListener('click', () => showLoadingThenAlert('Farmer registration'));
+  document.getElementById('checkStatusBtn').addEventListener('click', () => showLoadingThenAlert('My procurement status'));
+  document.getElementById('searchCentreBtn').addEventListener('click', () => showLoadingThenAlert('Procurement centre finder'));
+
+  function goStaff() {
+    showLoadingThenAlert('Staff login');
+    return false;
+  }
+
+  document.getElementById('langSelect').addEventListener('change', (e) => {
+    if (e.target.value === 'hi') {
+      document.querySelector('.hero-title').textContent = 'अपनी खरीद का स्लॉट बुक करें। इंतज़ार छोड़ें।';
+      document.querySelector('.hero-sub').textContent = 'अब घंटों लाइन में खड़े होने की ज़रूरत नहीं। स्लॉट बुक करें, टोकन पाएं, और अपनी स्थिति ट्रैक करें — अपने फोन से।';
+      document.getElementById('startBookingBtn').textContent = 'बुकिंग शुरू करें →';
+      document.getElementById('checkStatusBtn').textContent = 'मेरी स्थिति देखें';
+    } else {
+      document.querySelector('.hero-title').textContent = 'Book your procurement slot. Skip the wait.';
+      document.querySelector('.hero-sub').textContent = 'No more standing in line for hours without knowing when your turn will come. Book a slot, get a token, and track your status — all from your phone.';
+      document.getElementById('startBookingBtn').textContent = 'Start booking →';
+      document.getElementById('checkStatusBtn').textContent = 'Check my status';
+    }
+  });
+</script>
+
+</body>
+</html>
