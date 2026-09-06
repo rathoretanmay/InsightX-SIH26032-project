@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestLink - Procurement Centre Finder</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-green: #10B981;
+            --dark-green: #047857;
+            --light-green: #ECFDF5;
+            --accent-green: #34D399;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-sub: #4B5563;
+            --border-color: #D1D5DB;
+            --border-focus: #10B981;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        .app-header {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--primary-green);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--dark-green);
+            letter-spacing: -0.5px;
+        }
+
+        .system-badge {
+            font-size: 13px;
+            font-weight: 700;
+            background-color: var(--light-green);
+            color: var(--dark-green);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-green);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--light-green);
+            padding-bottom: 8px;
+        }
+
+        .card-description {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-sub);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-green);
+        }
+
+        .btn-secondary {
+            background-color: #FFFFFF;
+            color: var(--dark-green);
+            border: 2px solid var(--primary-green);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-secondary.active, .btn-secondary:hover {
+            background-color: var(--light-green);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .data-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            background-color: #F9FAFB;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .text-primary {
+            color: var(--dark-green) !important;
+            background-color: var(--light-green) !important;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+            border: 1px solid currentColor;
+        }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-grid-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .data-label {
+            font-size: 11px;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <header class="app-header">
+            <div class="header-container">
+                <div class="logo-area">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 22C2 22 10 18 14 14C18 10 22 2 22 2C22 2 14 6 10 10C6 14 2 22 2 22Z" />
+                        <path d="M9 15L15 9" />
+                    </svg>
+                    <span class="logo-text">HarvestLink</span>
+                </div>
+                <div class="header-right" style="display:flex; align-items:center; gap:8px;">
+                    <span class="system-badge">Centre Finder</span>
+                    <a href="index.html" class="btn-secondary">← Dashboard</a>
+                </div>
+            </div>
+        </header>
+        
+        <main class="dashboard-grid">
+            <section class="card">
+                <h2 class="card-title">🔍 Find Procurement Centres</h2>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                    <input type="text" id="searchInput" placeholder="Search city or mandi..." class="data-value" style="width: 100%;">
+                    <button class="btn-primary" id="searchBtn" style="width: auto;">Find</button>
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                    <button class="btn-secondary filter-btn active" data-filter="all">All</button>
+                    <button class="btn-secondary filter-btn" data-filter="wheat">Wheat</button>
+                    <button class="btn-secondary filter-btn" data-filter="open">Open Now</button>
+                </div>
+                
+                <div id="centreList" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="centre-card card" style="padding: 20px; box-shadow: none;" data-category="wheat open">
+                        <div class="card-header-flex" style="margin-bottom: 8px; padding-bottom: 8px;">
+                            <h3 class="card-title" style="margin:0; border:none; padding:0; font-size: 15px;">North Gate Mandi Yard</h3>
+                            <span class="status-badge badge-success">Open</span>
+                        </div>
+                        <p class="card-description" style="margin-bottom: 12px;">📍 Sector 14, Main Highway</p>
+                        <div class="data-grid-cols">
+                            <div class="data-group">
+                                <span class="data-label">Hours</span>
+                                <span class="data-value" style="font-size: 13px; padding: 6px 10px;">08:00 AM - 06:00 PM</span>
+                            </div>
+                            <div class="data-group">
+                                <span class="data-label">Queue</span>
+                                <span class="data-value text-primary" style="font-size: 13px; padding: 6px 10px;">04 Vehicles</span>
+                            </div>
+                        </div>
+                        <button class="btn-primary select-btn" style="margin-top: 14px; padding: 10px;" onclick="centerMap(28.6200, 77.2100, 'North Gate Mandi Yard')">Select Centre</button>
+                    </div>
+                    
+                    <div class="centre-card card" style="padding: 20px; box-shadow: none;" data-category="wheat open">
+                        <div class="card-header-flex" style="margin-bottom: 8px; padding-bottom: 8px;">
+                            <h3 class="card-title" style="margin:0; border:none; padding:0; font-size: 15px;">East District Grain Market</h3>
+                            <span class="status-badge badge-success">Open</span>
+                        </div>
+                        <p class="card-description" style="margin-bottom: 12px;">📍 Bypass Road, Grain Silos</p>
+                        <div class="data-grid-cols">
+                            <div class="data-group">
+                                <span class="data-label">Hours</span>
+                                <span class="data-value" style="font-size: 13px; padding: 6px 10px;">09:00 AM - 05:00 PM</span>
+                            </div>
+                            <div class="data-group">
+                                <span class="data-label">Queue</span>
+                                <span class="data-value" style="font-size: 13px; padding: 6px 10px;">12 Vehicles</span>
+                            </div>
+                        </div>
+                        <button class="btn-primary select-btn" style="margin-top: 14px; padding: 10px;" onclick="centerMap(28.6050, 77.2300, 'East District Grain Market')">Select Centre</button>
+                    </div>
+                </div>
+                
+                <div id="noResultsState" style="display: none; text-align: center; padding: 30px;">
+                    <p style="font-size: 16px; font-weight: bold; color: var(--dark-green);">No centres found</p>
+                    <p class="card-description">Try changing your search keyword.</p>
+                </div>
+            </section>
+            
+            <section class="card" style="display: flex; flex-direction: column;">
+                <h2 class="card-title">🗺️ Live Map View</h2>
+                <div id="map" style="flex-grow: 1; min-height: 350px; border-radius: 12px; margin-top: 8px; z-index: 1;"></div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([28.6139, 77.2150], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const markers = {
+            'North Gate Mandi Yard': L.marker([28.6200, 77.2100]).addTo(map).bindPopup('<b>North Gate Mandi Yard</b><br>Queue: 04 Vehicles'),
+            'East District Grain Market': L.marker([28.6050, 77.2300]).addTo(map).bindPopup('<b>East District Grain Market</b><br>Queue: 12 Vehicles')
+        };
+
+        function centerMap(lat, lng, name) {
+            map.setView([lat, lng], 15);
+            if (markers[name]) markers[name].openPopup();
+        }
+
+        const searchInput = document.getElementById('searchInput');
+        const centreCards = document.querySelectorAll('.centre-card');
+        const noResults = document.getElementById('noResultsState');
+
+        function filterList() {
+            const val = (searchInput.value || '').toLowerCase();
+            let count = 0;
+            centreCards.forEach(c => {
+                const match = c.textContent.toLowerCase().includes(val);
+                c.style.display = match ? 'block' : 'none';
+                if (match) count++;
+            });
+            noResults.style.display = count === 0 ? 'block' : 'none';
+        }
+
+        if (searchInput) searchInput.addEventListener('input', filterList);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

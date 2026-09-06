@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#28783d">
+    <title>HarvestLink - Depot Queue Status</title>
+    <style>
+        :root {
+            --primary-green: #10B981;
+            --dark-green: #047857;
+            --light-green: #ECFDF5;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-sub: #4B5563;
+            --border-color: #D1D5DB;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark-green);
+        }
+
+        .demo-pill {
+            background: var(--light-green);
+            color: var(--dark-green);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            color: var(--dark-green);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: 28px;
+            font-weight: 900;
+            margin: 4px 0;
+        }
+
+        .hero h1 span { color: var(--primary-green); }
+
+        .token-card {
+            background: var(--light-green);
+            border: 2px solid var(--primary-green);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .token-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--dark-green);
+        }
+
+        .active-badge {
+            background: var(--primary-green);
+            color: #FFF;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-card strong {
+            font-size: 24px;
+            color: var(--dark-green);
+        }
+
+        .progress-card, .counters-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .progress-track {
+            height: 12px;
+            background: #E5E7EB;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-green);
+            transition: width 0.3s ease;
+        }
+
+        .counter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .counter-item {
+            background: #F9FAFB;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .simulate-btn {
+            background: var(--primary-green);
+            color: #FFF;
+            border: none;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .stats-grid, .counter-grid { grid-template-columns: 1fr 1fr; }
+            .hero { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app-shell">
+    <header class="topbar">
+        <div class="brand">HarvestLink</div>
+        <div class="demo-pill">DEMO MODE</div>
+        <div class="sync-status">
+            <span id="syncText">Simulation synced: </span>
+            <span class="sync-time" id="syncTime">18:41:25</span>
+            <a href="index.html" style="margin-left: 12px; text-decoration: none; color: var(--dark-green); font-weight: 700;">← Back</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div>
+                <p class="eyebrow">DEPOT OPERATIONS • QUEUE MONITOR</p>
+                <h1>Depot Queue <span>Status</span></h1>
+                <p class="subtitle">A clear view of your place in the grain intake & inspection queue.</p>
+            </div>
+        </section>
+
+        <section class="token-card">
+            <div class="token-copy">
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-sub);">YOUR TOKEN NUMBER</span>
+                <div class="token-number" id="tokenNumber">A-104</div>
+                <p>Farmer: <strong id="farmerName">Samuel Kato</strong></p>
+            </div>
+            <div class="active-badge">ACTIVE</div>
+        </section>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <span>Queue Position</span>
+                <strong id="position">3rd</strong>
+                <small><span id="ahead">3</span> farmers ahead</small>
+            </article>
+            <article class="stat-card">
+                <span>Estimated Wait</span>
+                <strong><span id="wait">12</span> mins</strong>
+                <small>~4 mins per counter</small>
+            </article>
+            <article class="stat-card">
+                <span>Active Counters</span>
+                <strong><span id="activeCounters">4</span> / 5</strong>
+                <small>Gates 1 & 2 operational</small>
+            </article>
+            <article class="stat-card">
+                <span>Current Serving</span>
+                <strong id="currentServing">A-101</strong>
+                <small id="currentCounter">Counter #2</small>
+            </article>
+        </section>
+
+        <section class="progress-card">
+            <div style="display: flex; justify-content: space-between;">
+                <h3>Overall Queue Progress</h3>
+                <strong id="progressPercent">70%</strong>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width:70%"></div>
+            </div>
+            <p id="progressMessage" style="font-size: 13px; color: var(--text-sub);">Moving steadily</p>
+        </section>
+
+        <section class="counters-card">
+            <h3>Active Inspection Counters</h3>
+            <div class="counter-grid" id="counterGrid">
+                <div class="counter-item"><strong>Counter 1</strong><p>Gate Intake</p></div>
+                <div class="counter-item"><strong>Counter 2</strong><p>Serving A-101</p></div>
+                <div class="counter-item"><strong>Counter 3</strong><p>Moisture Lab</p></div>
+                <div class="counter-item"><strong>Counter 4</strong><p>Weighbridge</p></div>
+            </div>
+        </section>
+
+        <section class="action-area" style="text-align: center; margin-top: 20px;">
+            <button id="simulateBtn" class="simulate-btn">↻ Simulate Queue Step</button>
+        </section>
+    </main>
+</div>
+
+<script>
+    let aheadCount = 3;
+    let currentPct = 70;
+    const btn = document.getElementById('simulateBtn');
+    
+    if (btn) {
+        btn.addEventListener('click', () => {
+            if (aheadCount > 0) {
+                aheadCount -= 1;
+                currentPct = Math.min(100, currentPct + 10);
+                document.getElementById('ahead').textContent = aheadCount;
+                document.getElementById('position').textContent = aheadCount === 0 ? 'NOW' : `${aheadCount}th`;
+                document.getElementById('wait').textContent = aheadCount * 4;
+                document.getElementById('progressFill').style.width = `${currentPct}%`;
+                document.getElementById('progressPercent').textContent = `${currentPct}%`;
+            } else {
+                alert('Your token is now called to Counter 2!');
+            }
+        });
+    }
+
+    setInterval(() => {
+        const timeEl = document.getElementById('syncTime');
+        if (timeEl) timeEl.textContent = new Date().toLocaleTimeString();
+    }, 1000);
+</script>
+</body>
+</html>
