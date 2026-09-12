@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Queue — Harvest Link</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E; --green-700: #2D4A2B; --green-500: #4C6E48; --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7; --gold: #C9962C; --gold-dark: #9C7420; --gold-bg: #FBF1DD;
+    --white: #FFFFFF; --ink: #1E231E; --ink-soft: #5A6156; --border: #D6DCCE;
+    --danger: #B23A2E; --danger-bg: #FBEAE7; --success: #2D6A3E; --success-bg: #E2F1E4;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--sage-bg); color: var(--ink); min-height: 100vh; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2rem; max-width: 620px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--green-900); }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .farmer-badge { display: flex; align-items: center; gap: 8px; }
+  .farmer-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--green-900); font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .farmer-name { font-size: 13.5px; font-weight: 500; }
+  .farmer-village { font-size: 11.5px; color: var(--ink-soft); }
+
+  .subnav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 46px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); max-width: 620px; margin: 0 auto; }
+  .subnav .current { color: var(--green-900); font-weight: 500; }
+
+  main { max-width: 620px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+  .demo-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--gold-bg); color: var(--gold-dark);
+    font-size: 11.5px; font-weight: 600;
+    padding: 5px 12px; border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+  .demo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold-dark); }
+
+  .sync-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+  .page-title { font-family: 'Fraunces', serif; font-size: 1.45rem; font-weight: 600; }
+  .sync-indicator { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.6s ease infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .queue-hero {
+    background: var(--green-700);
+    color: var(--white);
+    border-radius: var(--radius);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    margin-bottom: 1.3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .queue-hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(115deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 40px);
+  }
+  .queue-token { font-size: 12.5px; color: var(--green-100); position: relative; z-index: 1; }
+  .queue-position-num { font-family: 'Fraunces', serif; font-size: 3.5rem; font-weight: 700; line-height: 1.1; position: relative; z-index: 1; }
+  .queue-position-label { font-size: 13px; color: var(--green-100); margin-top: 2px; position: relative; z-index: 1; }
+  .queue-wait { font-size: 13.5px; font-weight: 600; color: var(--gold); margin-top: 10px; position: relative; z-index: 1; }
+
+  .progress-track { height: 8px; background: rgba(255,255,255,0.2); border-radius: 6px; margin-top: 1.1rem; overflow: hidden; position: relative; z-index: 1; }
+  .progress-fill { height: 100%; background: var(--gold); border-radius: 6px; transition: width 0.6s ease; }
+
+  .counters-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1.2rem; }
+  .card-title { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 10px; }
+  .counters-row { display: flex; gap: 10px; }
+  .counter-chip { flex: 1; text-align: center; padding: 10px; border-radius: 9px; background: var(--sage-bg); font-size: 12px; }
+  .counter-chip.active-serving { background: var(--success-bg); color: var(--success); }
+  .counter-chip.offline { background: var(--danger-bg); color: var(--danger); }
+  .counter-num { font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
+
+  .ahead-list-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1.2rem; }
+  .ahead-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .ahead-row:last-child { border-bottom: none; }
+  .ahead-pos { color: var(--ink-soft); }
+  .ahead-status { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
+  .ahead-status.serving { background: var(--success-bg); color: var(--success); }
+  .ahead-status.waiting { background: var(--gold-bg); color: var(--gold-dark); }
+
+  .leave-note { font-size: 12px; color: var(--ink-soft); text-align: center; line-height: 1.6; }
+
+  @media (max-width: 480px) {
+    .topbar { padding: 1rem 1.25rem; }
+    .subnav { padding: 0 1.25rem; overflow-x: auto; white-space: nowrap; }
+    main { padding: 1.25rem 1.1rem 3rem; }
+    .queue-position-num { font-size: 2.8rem; }
+  }
+</style>
+  <link rel="stylesheet" href="assets/kisanqueue-nav.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span>🌾</span><span class="brand-mark">Harvest Link</span></div>
+    <div class="header-right">
+      <div class="farmer-badge">
+        <div class="farmer-avatar">SY</div>
+        <div><div class="farmer-name">Suresh Yadav</div><div class="farmer-village">Kheri Village</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subnav">
+    <span>Dashboard</span><span>/</span><span>Centre finder</span><span>/</span><span class="current">Live queue</span><span>/</span><span>Notifications</span><span>/</span><span>Alerts</span>
+  </div>
+
+  <main>
+    <div class="demo-label"><span class="demo-dot"></span>Demo data — not a live connection</div>
+
+    <div class="sync-row">
+      <div class="page-title">Live queue</div>
+      <div class="sync-indicator"><span class="sync-dot"></span>Synced just now</div>
+    </div>
+
+    <div class="queue-hero">
+      <div class="queue-token">Token #A245 · Centre A — Ambala Cantt</div>
+      <div class="queue-position-num" id="posNum">3</div>
+      <div class="queue-position-label">farmers ahead of you</div>
+      <div class="queue-wait" id="waitText">Estimated wait: ~18 min</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:55%"></div></div>
+    </div>
+
+    <div class="counters-card">
+      <div class="card-title">Counters at this centre</div>
+      <div class="counters-row">
+        <div class="counter-chip active-serving"><div class="counter-num">1</div>Serving #A233</div>
+        <div class="counter-chip active-serving"><div class="counter-num">2</div>Serving #A240</div>
+        <div class="counter-chip offline"><div class="counter-num">3</div>Offline</div>
+      </div>
+    </div>
+
+    <div class="ahead-list-card">
+      <div class="card-title">Ahead of you</div>
+      <div class="ahead-row"><span>#A240</span><span class="ahead-status serving">Being served</span></div>
+      <div class="ahead-row"><span>#A241</span><span class="ahead-pos">1st in line</span></div>
+      <div class="ahead-row"><span>#A243</span><span class="ahead-pos">2nd in line</span></div>
+      <div class="ahead-row"><span>#A245 (you)</span><span class="ahead-status waiting">3rd in line</span></div>
+    </div>
+
+    <div class="leave-note">This screen updates automatically while you wait. You'll get a notification when it's almost your turn.</div>
+  </main>
+
+<script>
+  // Mock "live" movement so the demo visibly changes, clearly labeled as demo data above.
+  let position = 3;
+  function tick() {
+    if (position > 0) {
+      position -= 1;
+      document.getElementById('posNum').textContent = position;
+      const waitMin = position * 6;
+      document.getElementById('waitText').textContent = position === 0 ? 'You\u2019re next — please proceed to the counter' : 'Estimated wait: ~' + waitMin + ' min';
+      document.getElementById('progressFill').style.width = (100 - position * 18) + '%';
+    }
+  }
+  setInterval(tick, 6000);
+</script>
+
+  <script src="assets/kisanqueue-nav.js"></script>
+</body>
+</html>

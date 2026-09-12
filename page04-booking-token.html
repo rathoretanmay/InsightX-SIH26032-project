@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Token — Procurement Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E;
+    --green-700: #2D4A2B;
+    --green-500: #4C6E48;
+    --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7;
+    --gold: #C9962C;
+    --gold-dark: #9C7420;
+    --gold-bg: #FBF1DD;
+    --white: #FFFFFF;
+    --ink: #1E231E;
+    --ink-soft: #5A6156;
+    --border: #D6DCCE;
+    --danger: #B23A2E;
+    --danger-bg: #FBEAE7;
+    --success: #2D6A3E;
+    --success-bg: #E2F1E4;
+    --grey-bg: #EEEEEC;
+    --grey-text: #6B6B67;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--sage-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2rem;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--green-900); }
+  .back-link { font-size: 13px; color: var(--ink-soft); text-decoration: none; }
+
+  main { max-width: 560px; margin: 0 auto; padding: 0.5rem 1.5rem 4rem; }
+
+  .demo-toggle { display: flex; gap: 8px; margin-bottom: 1.4rem; justify-content: center; }
+  .demo-toggle button {
+    font-size: 12px; font-family: 'Inter', sans-serif; padding: 6px 12px;
+    border-radius: 7px; border: 1px solid var(--border); background: var(--white);
+    color: var(--ink-soft); cursor: pointer;
+  }
+  .demo-toggle button.active { background: var(--green-900); color: var(--white); border-color: var(--green-900); }
+
+  .token-card {
+    background: var(--green-700);
+    border-radius: var(--radius);
+    padding: 1.8rem 1.6rem;
+    text-align: center;
+    color: var(--white);
+    margin-bottom: 1.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .token-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(115deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 40px);
+  }
+  .token-card.cancelled, .token-card.expired {
+    background: var(--grey-bg);
+    color: var(--ink);
+  }
+  .token-card.cancelled::before, .token-card.expired::before { display: none; }
+
+  .token-status-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+  .token-status-badge.confirmed { background: rgba(255,255,255,0.18); color: var(--white); }
+  .token-status-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
+  .token-status-badge.expired { background: var(--white); color: var(--grey-text); border: 1px solid var(--border); }
+
+  .token-number {
+    font-family: 'Fraunces', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    position: relative;
+    z-index: 1;
+  }
+  .token-card.cancelled .token-number, .token-card.expired .token-number {
+    text-decoration: line-through;
+    color: var(--ink-soft);
+  }
+  .token-sub { font-size: 12.5px; color: var(--green-100); margin-top: 6px; position: relative; z-index: 1; }
+  .token-card.cancelled .token-sub, .token-card.expired .token-sub { color: var(--ink-soft); }
+
+  .qr-box {
+    width: 96px; height: 96px;
+    background: var(--white);
+    border-radius: 10px;
+    margin: 1.2rem auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .action-row { display: flex; gap: 8px; margin-bottom: 1.4rem; }
+  .action-btn {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .action-btn:hover { border-color: var(--green-500); }
+  .action-icon { font-size: 16px; }
+
+  .details-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+  .detail-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { color: var(--ink-soft); }
+  .detail-value { color: var(--ink); font-weight: 500; text-align: right; }
+
+  .queue-strip {
+    background: var(--gold-bg);
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+  }
+  .queue-strip-text { font-size: 13px; color: var(--gold-dark); font-weight: 500; }
+  .queue-strip-num { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 700; color: var(--gold-dark); }
+
+  .instructions-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+  .instructions-title { font-size: 13.5px; font-weight: 600; color: var(--green-900); margin-bottom: 0.8rem; }
+  .instructions-list { list-style: none; }
+  .instructions-list li { display: flex; gap: 9px; font-size: 13px; color: var(--ink-soft); margin-bottom: 9px; line-height: 1.5; }
+  .instructions-list li:last-child { margin-bottom: 0; }
+  .instr-dot { color: var(--green-700); flex-shrink: 0; }
+
+  .status-message {
+    display: none;
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  .status-message.show { display: block; }
+  .status-message-text { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 1rem; }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border: none;
+    background: var(--green-700);
+    color: var(--white);
+  }
+  .btn:hover { background: var(--green-900); }
+
+  .toast-stack { position: fixed; bottom: 20px; left: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 60; }
+  .toast {
+    background: var(--green-900); color: var(--white); font-size: 13px;
+    padding: 11px 16px; border-radius: 9px; box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    opacity: 0; transform: translateY(6px); transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 480px) {
+    .topbar { padding: 1rem 1.25rem; }
+    main { padding: 0.5rem 1.1rem 3rem; }
+    .token-number { font-size: 2.4rem; }
+  }
+</style>
+  <link rel="stylesheet" href="assets/kisanqueue-nav.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span>🌾</span><span class="brand-mark">Harvest Link</span></div>
+    <a href="#" class="back-link">← Back home</a>
+  </div>
+
+  <main>
+    <div class="demo-toggle">
+      <button class="active" id="btnActive">Active</button>
+      <button id="btnCancelled">Cancelled</button>
+      <button id="btnExpired">Expired</button>
+    </div>
+
+    <div class="token-card" id="tokenCard">
+      <span class="token-status-badge confirmed" id="statusBadge">Confirmed</span>
+      <div class="token-number">#A245</div>
+      <div class="token-sub" id="tokenSub">Centre A — Ambala Cantt · Today, 10:00 AM</div>
+      <div class="qr-box">
+        <svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+          <rect width="72" height="72" fill="#FFFFFF"/>
+          <g fill="#1E231E">
+            <rect x="4" y="4" width="18" height="18"/><rect x="8" y="8" width="10" height="10" fill="#FFFFFF"/><rect x="11" y="11" width="4" height="4"/>
+            <rect x="50" y="4" width="18" height="18"/><rect x="54" y="8" width="10" height="10" fill="#FFFFFF"/><rect x="57" y="11" width="4" height="4"/>
+            <rect x="4" y="50" width="18" height="18"/><rect x="8" y="54" width="10" height="10" fill="#FFFFFF"/><rect x="11" y="57" width="4" height="4"/>
+            <rect x="26" y="4" width="4" height="4"/><rect x="34" y="4" width="4" height="4"/><rect x="26" y="12" width="4" height="4"/>
+            <rect x="34" y="20" width="4" height="4"/><rect x="26" y="28" width="4" height="4"/><rect x="42" y="12" width="4" height="4"/>
+            <rect x="26" y="36" width="4" height="4"/><rect x="34" y="36" width="4" height="4"/><rect x="42" y="36" width="4" height="4"/>
+            <rect x="50" y="26" width="4" height="4"/><rect x="58" y="26" width="4" height="4"/><rect x="50" y="34" width="4" height="4"/>
+            <rect x="66" y="34" width="4" height="4"/><rect x="58" y="42" width="4" height="4"/><rect x="50" y="50" width="4" height="4"/>
+            <rect x="26" y="50" width="4" height="4"/><rect x="34" y="58" width="4" height="4"/><rect x="42" y="50" width="4" height="4"/>
+            <rect x="42" y="58" width="4" height="4"/><rect x="26" y="66" width="4" height="4"/><rect x="58" y="58" width="4" height="4"/>
+            <rect x="66" y="66" width="4" height="4"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="action-row" id="actionRow">
+      <button class="action-btn" id="copyBtn"><span class="action-icon">📋</span>Copy</button>
+      <button class="action-btn" id="downloadBtn"><span class="action-icon">⬇️</span>Download</button>
+      <button class="action-btn" id="shareBtn"><span class="action-icon">📤</span>Share</button>
+    </div>
+
+    <div class="queue-strip" id="queueStrip">
+      <span class="queue-strip-text">Your position in queue</span>
+      <span class="queue-strip-num">3</span>
+    </div>
+
+    <div class="details-card">
+      <div class="detail-row"><span class="detail-label">Centre</span><span class="detail-value">Centre A — Ambala Cantt</span></div>
+      <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">Today, 5 Sep</span></div>
+      <div class="detail-row"><span class="detail-label">Slot</span><span class="detail-value">10:00 – 10:30 AM</span></div>
+      <div class="detail-row"><span class="detail-label">Expected arrival</span><span class="detail-value" id="arrivalValue">By 9:50 AM</span></div>
+      <div class="detail-row"><span class="detail-label">Produce</span><span class="detail-value">Wheat, 25 quintal</span></div>
+    </div>
+
+    <div class="instructions-card" id="instructionsCard">
+      <div class="instructions-title">Before you arrive</div>
+      <ul class="instructions-list">
+        <li><span class="instr-dot">●</span>Arrive at least 10 minutes before your slot time.</li>
+        <li><span class="instr-dot">●</span>Bring your farmer ID if you have one registered.</li>
+        <li><span class="instr-dot">●</span>Show this token at the entry counter.</li>
+        <li><span class="instr-dot">●</span>You'll be notified here when it's almost your turn.</li>
+      </ul>
+    </div>
+
+    <div class="status-message" id="cancelledMessage">
+      <div class="status-message-text">This booking was cancelled. If this wasn't you, please contact the centre.</div>
+      <button class="btn" id="rebookFromCancelled">Book a new slot</button>
+    </div>
+
+    <div class="status-message" id="expiredMessage">
+      <div class="status-message-text">This slot has passed. You'll need to book a new slot to continue.</div>
+      <button class="btn" id="rebookFromExpired">Book a new slot</button>
+    </div>
+  </main>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+<script>
+  function showToast(msg) {
+    const stack = document.getElementById('toastStack');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    stack.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 250);
+    }, 2600);
+  }
+
+  const btnActive = document.getElementById('btnActive');
+  const btnCancelled = document.getElementById('btnCancelled');
+  const btnExpired = document.getElementById('btnExpired');
+  const tokenCard = document.getElementById('tokenCard');
+  const statusBadge = document.getElementById('statusBadge');
+  const actionRow = document.getElementById('actionRow');
+  const queueStrip = document.getElementById('queueStrip');
+  const instructionsCard = document.getElementById('instructionsCard');
+  const cancelledMessage = document.getElementById('cancelledMessage');
+  const expiredMessage = document.getElementById('expiredMessage');
+  const tokenSub = document.getElementById('tokenSub');
+
+  function setActiveBtn(btn) {
+    [btnActive, btnCancelled, btnExpired].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function setState(state) {
+    tokenCard.classList.remove('cancelled', 'expired');
+    statusBadge.classList.remove('confirmed', 'cancelled', 'expired');
+    actionRow.style.display = 'flex';
+    queueStrip.style.display = 'flex';
+    instructionsCard.style.display = 'block';
+    cancelledMessage.classList.remove('show');
+    expiredMessage.classList.remove('show');
+
+    if (state === 'active') {
+      statusBadge.classList.add('confirmed');
+      statusBadge.textContent = 'Confirmed';
+      tokenSub.textContent = 'Centre A — Ambala Cantt · Today, 10:00 AM';
+    } else if (state === 'cancelled') {
+      tokenCard.classList.add('cancelled');
+      statusBadge.classList.add('cancelled');
+      statusBadge.textContent = 'Cancelled';
+      tokenSub.textContent = 'This token is no longer valid';
+      actionRow.style.display = 'none';
+      queueStrip.style.display = 'none';
+      instructionsCard.style.display = 'none';
+      cancelledMessage.classList.add('show');
+    } else if (state === 'expired') {
+      tokenCard.classList.add('expired');
+      statusBadge.classList.add('expired');
+      statusBadge.textContent = 'Expired';
+      tokenSub.textContent = 'This slot time has passed';
+      actionRow.style.display = 'none';
+      queueStrip.style.display = 'none';
+      instructionsCard.style.display = 'none';
+      expiredMessage.classList.add('show');
+    }
+  }
+
+  btnActive.addEventListener('click', () => { setActiveBtn(btnActive); setState('active'); });
+  btnCancelled.addEventListener('click', () => { setActiveBtn(btnCancelled); setState('cancelled'); });
+  btnExpired.addEventListener('click', () => { setActiveBtn(btnExpired); setState('expired'); });
+
+  document.getElementById('copyBtn').addEventListener('click', () => showToast('Token #A245 copied to clipboard'));
+  document.getElementById('downloadBtn').addEventListener('click', () => showToast('Token image downloaded (demo)'));
+  document.getElementById('shareBtn').addEventListener('click', () => showToast('Share sheet opened (demo)'));
+  document.getElementById('rebookFromCancelled').addEventListener('click', () => alert('This connects to the "Slot booking" page once the flow is linked.'));
+  document.getElementById('rebookFromExpired').addEventListener('click', () => alert('This connects to the "Slot booking" page once the flow is linked.'));
+
+  setState('active');
+</script>
+
+  <script src="assets/kisanqueue-nav.js"></script>
+</body>
+</html>

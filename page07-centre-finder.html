@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find a Centre — Harvest Link</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E; --green-700: #2D4A2B; --green-500: #4C6E48; --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7; --gold: #C9962C; --gold-dark: #9C7420; --gold-bg: #FBF1DD;
+    --white: #FFFFFF; --ink: #1E231E; --ink-soft: #5A6156; --border: #D6DCCE;
+    --danger: #B23A2E; --danger-bg: #FBEAE7; --success: #2D6A3E; --success-bg: #E2F1E4;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--sage-bg); color: var(--ink); min-height: 100vh; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2rem; max-width: 1000px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--green-900); }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .farmer-badge { display: flex; align-items: center; gap: 8px; }
+  .farmer-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--green-900); font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .farmer-name { font-size: 13.5px; font-weight: 500; }
+  .farmer-village { font-size: 11.5px; color: var(--ink-soft); }
+
+  .subnav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 46px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); max-width: 1000px; margin: 0 auto; }
+  .subnav .current { color: var(--green-900); font-weight: 500; }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+  .page-title { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 1.2rem; }
+
+  .search-row { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .search-box { flex: 1; min-width: 220px; background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .search-box input { flex: 1; border: none; outline: none; font-size: 14px; font-family: 'Inter', sans-serif; background: transparent; }
+  .locate-btn { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .locate-btn:hover { border-color: var(--green-500); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 1.4rem; flex-wrap: wrap; }
+  .filter-chip { font-size: 12.5px; font-weight: 500; padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--white); color: var(--ink-soft); cursor: pointer; }
+  .filter-chip.active { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+
+  .view-toggle { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; margin-bottom: 1.2rem; width: fit-content; }
+  .view-btn { font-size: 12.5px; font-weight: 500; padding: 8px 16px; border: none; background: var(--white); color: var(--ink-soft); cursor: pointer; border-right: 1px solid var(--border); }
+  .view-btn:last-child { border-right: none; }
+  .view-btn.active { background: var(--green-700); color: var(--white); }
+
+  .map-placeholder {
+    display: none;
+    background: var(--green-100);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    height: 260px;
+    margin-bottom: 1.4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .map-placeholder.show { display: block; }
+  .map-placeholder::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(60deg, rgba(45,74,43,0.05) 0px, rgba(45,74,43,0.05) 2px, transparent 2px, transparent 30px);
+  }
+  .map-pin { position: absolute; font-size: 22px; z-index: 1; }
+  .map-label {
+    position: absolute; bottom: 12px; left: 12px; right: 12px;
+    background: var(--white); border-radius: 9px; padding: 8px 12px;
+    font-size: 12px; color: var(--ink-soft); z-index: 1;
+  }
+
+  .centre-list.hidden { display: none; }
+
+  .centre-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 12px; }
+  .centre-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .centre-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem; color: var(--green-900); }
+  .centre-addr { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .capacity-badge { font-size: 10.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .capacity-badge.available { background: var(--success-bg); color: var(--success); }
+  .capacity-badge.almost { background: var(--gold-bg); color: var(--gold-dark); }
+  .capacity-badge.full { background: var(--danger-bg); color: var(--danger); }
+
+  .centre-meta-grid { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 12px; }
+  .centre-meta-grid strong { display: block; color: var(--ink); font-size: 13.5px; margin-top: 2px; }
+
+  .centre-actions { display: flex; gap: 8px; }
+  .action-btn { flex: 1; padding: 9px; border-radius: 8px; font-size: 12.5px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--ink); }
+  .action-btn.primary { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+  .action-btn.primary:hover { background: var(--green-900); }
+  .action-btn:hover { border-color: var(--green-500); }
+
+  .empty-state, .denied-state { display: none; text-align: center; padding: 3rem 1rem; background: var(--white); border: 1px dashed var(--border); border-radius: var(--radius); }
+  .empty-state.show, .denied-state.show { display: block; }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; }
+  .empty-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+  .empty-sub { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 1.1rem; }
+  .btn { padding: 11px 20px; border-radius: 9px; font-size: 13.5px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; background: var(--green-700); color: var(--white); }
+  .btn:hover { background: var(--green-900); }
+
+  .demo-toggle { display: flex; gap: 8px; margin-bottom: 1.2rem; justify-content: flex-end; flex-wrap: wrap; }
+  .demo-toggle button { font-size: 11.5px; font-family: 'Inter', sans-serif; padding: 6px 11px; border-radius: 7px; border: 1px solid var(--border); background: var(--white); color: var(--ink-soft); cursor: pointer; }
+  .demo-toggle button.active { background: var(--green-900); color: var(--white); border-color: var(--green-900); }
+
+  @media (max-width: 700px) {
+    .topbar { padding: 1rem 1.25rem; }
+    .subnav { padding: 0 1.25rem; overflow-x: auto; white-space: nowrap; }
+    main { padding: 1.25rem 1.1rem 3rem; }
+  }
+</style>
+  <link rel="stylesheet" href="assets/kisanqueue-nav.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span>🌾</span><span class="brand-mark">Harvest Link</span></div>
+    <div class="header-right">
+      <div class="farmer-badge">
+        <div class="farmer-avatar">SY</div>
+        <div><div class="farmer-name">Suresh Yadav</div><div class="farmer-village">Kheri Village</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subnav">
+    <span>Dashboard</span><span>/</span><span class="current">Centre finder</span><span>/</span><span>Live queue</span><span>/</span><span>Notifications</span><span>/</span><span>Alerts</span>
+  </div>
+
+  <main>
+    <div class="page-title">Find a procurement centre</div>
+
+    <div class="demo-toggle">
+      <button class="active" id="btnResults">Results</button>
+      <button id="btnNoResults">No results</button>
+      <button id="btnDenied">Location denied</button>
+    </div>
+
+    <div class="search-row">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="Search village, district, or centre name">
+      </div>
+      <button class="locate-btn" id="locateBtn">📍 Use my location</button>
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="available">Available now</button>
+      <button class="filter-chip" data-filter="wheat">Accepts wheat</button>
+      <button class="filter-chip" data-filter="mustard">Accepts mustard</button>
+    </div>
+
+    <div class="view-toggle">
+      <button class="view-btn active" id="listViewBtn">List</button>
+      <button class="view-btn" id="mapViewBtn">Map</button>
+    </div>
+
+    <div class="map-placeholder" id="mapPlaceholder">
+      <span class="map-pin" style="top: 40px; left: 60px;">📍</span>
+      <span class="map-pin" style="top: 110px; left: 200px;">📍</span>
+      <span class="map-pin" style="top: 70px; left: 300px;">📍</span>
+      <div class="map-label">Map integration is frontend-ready — pins show approximate centre locations near you.</div>
+    </div>
+
+    <div class="centre-list" id="centreList"></div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No centres found</div>
+      <div class="empty-sub">Try a different village, district, or clear your filters.</div>
+      <button class="btn" id="clearFiltersBtn">Clear filters</button>
+    </div>
+
+    <div class="denied-state" id="deniedState">
+      <div class="empty-icon">📍</div>
+      <div class="empty-title">Location access denied</div>
+      <div class="empty-sub">Turn on location access in your phone settings, or search by village or district instead.</div>
+      <button class="btn" id="searchInsteadBtn">Search manually</button>
+    </div>
+  </main>
+
+<script>
+  const CENTRES = [
+    { name: 'Centre A — Ambala Cantt', addr: 'Grain Market Road · 2.4 km away', hours: '8:00 AM – 6:00 PM', today: '86 booked today', queue: '14 waiting', status: 'available', crops: ['wheat','mustard'] },
+    { name: 'Centre B — Yamunanagar', addr: 'Mandi Complex · 11 km away', hours: '8:00 AM – 6:00 PM', today: '52 booked today', queue: '6 waiting', status: 'almost', crops: ['wheat'] },
+    { name: 'Centre C — Kurukshetra', addr: 'New Grain Yard · 19 km away', hours: '9:00 AM – 5:00 PM', today: '108 booked today', queue: 'Full', status: 'full', crops: ['mustard'] }
+  ];
+
+  function badgeLabel(status) { return status === 'available' ? 'Available' : status === 'almost' ? 'Almost full' : 'Full'; }
+
+  function renderCentres(filter) {
+    const list = document.getElementById('centreList');
+    list.innerHTML = '';
+    let filtered = CENTRES;
+    if (filter === 'available') filtered = CENTRES.filter(c => c.status !== 'full');
+    if (filter === 'wheat') filtered = CENTRES.filter(c => c.crops.includes('wheat'));
+    if (filter === 'mustard') filtered = CENTRES.filter(c => c.crops.includes('mustard'));
+
+    filtered.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'centre-card';
+      card.innerHTML = '<div class="centre-top"><div><div class="centre-name">' + c.name + '</div><div class="centre-addr">' + c.addr + '</div></div>' +
+        '<span class="capacity-badge ' + c.status + '">' + badgeLabel(c.status) + '</span></div>' +
+        '<div class="centre-meta-grid"><div>Hours<strong>' + c.hours + '</strong></div><div>Today\u2019s activity<strong>' + c.today + '</strong></div><div>Queue<strong>' + c.queue + '</strong></div></div>' +
+        '<div class="centre-actions"><button class="action-btn">View details</button><button class="action-btn primary">Book a slot</button></div>';
+      list.appendChild(card);
+    });
+    return filtered.length;
+  }
+
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const count = renderCentres(chip.dataset.filter);
+      toggleEmptyState(count);
+    });
+  });
+
+  function toggleEmptyState(count) {
+    document.getElementById('emptyState').classList.toggle('show', count === 0);
+    document.getElementById('centreList').classList.toggle('hidden', count === 0);
+  }
+
+  document.getElementById('listViewBtn').addEventListener('click', () => {
+    document.getElementById('listViewBtn').classList.add('active');
+    document.getElementById('mapViewBtn').classList.remove('active');
+    document.getElementById('mapPlaceholder').classList.remove('show');
+    document.getElementById('centreList').classList.remove('hidden');
+  });
+  document.getElementById('mapViewBtn').addEventListener('click', () => {
+    document.getElementById('mapViewBtn').classList.add('active');
+    document.getElementById('listViewBtn').classList.remove('active');
+    document.getElementById('mapPlaceholder').classList.add('show');
+  });
+
+  const btnResults = document.getElementById('btnResults');
+  const btnNoResults = document.getElementById('btnNoResults');
+  const btnDenied = document.getElementById('btnDenied');
+  const emptyState = document.getElementById('emptyState');
+  const deniedState = document.getElementById('deniedState');
+  const centreList = document.getElementById('centreList');
+
+  function setActiveDemoBtn(btn) {
+    [btnResults, btnNoResults, btnDenied].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  btnResults.addEventListener('click', () => {
+    setActiveDemoBtn(btnResults);
+    deniedState.classList.remove('show');
+    renderCentres('all');
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-filter="all"]').classList.add('active');
+    toggleEmptyState(CENTRES.length);
+  });
+  btnNoResults.addEventListener('click', () => {
+    setActiveDemoBtn(btnNoResults);
+    deniedState.classList.remove('show');
+    centreList.innerHTML = '';
+    toggleEmptyState(0);
+  });
+  btnDenied.addEventListener('click', () => {
+    setActiveDemoBtn(btnDenied);
+    emptyState.classList.remove('show');
+    centreList.classList.add('hidden');
+    deniedState.classList.add('show');
+  });
+
+  document.getElementById('clearFiltersBtn').addEventListener('click', () => btnResults.click());
+  document.getElementById('searchInsteadBtn').addEventListener('click', () => btnResults.click());
+  document.getElementById('locateBtn').addEventListener('click', () => btnDenied.click());
+
+  renderCentres('all');
+</script>
+
+  <script src="assets/kisanqueue-nav.js"></script>
+</body>
+</html>

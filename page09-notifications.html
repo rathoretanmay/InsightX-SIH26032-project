@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — Harvest Link</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #1E231E; --green-700: #2D4A2B; --green-500: #4C6E48; --green-100: #DCE6D6;
+    --sage-bg: #EDF1E7; --gold: #C9962C; --gold-dark: #9C7420; --gold-bg: #FBF1DD;
+    --white: #FFFFFF; --ink: #1E231E; --ink-soft: #5A6156; --border: #D6DCCE;
+    --danger: #B23A2E; --danger-bg: #FBEAE7; --success: #2D6A3E; --success-bg: #E2F1E4;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--sage-bg); color: var(--ink); min-height: 100vh; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2rem; max-width: 640px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; color: var(--green-900); }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .farmer-badge { display: flex; align-items: center; gap: 8px; }
+  .farmer-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--green-900); font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .farmer-name { font-size: 13.5px; font-weight: 500; }
+  .farmer-village { font-size: 11.5px; color: var(--ink-soft); }
+
+  .subnav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 46px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); max-width: 640px; margin: 0 auto; }
+  .subnav .current { color: var(--green-900); font-weight: 500; }
+
+  main { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+  .page-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 8px; }
+  .page-title { font-family: 'Fraunces', serif; font-size: 1.45rem; font-weight: 600; }
+  .mark-read-btn { font-size: 12.5px; font-weight: 500; color: var(--green-700); background: none; border: none; cursor: pointer; }
+  .mark-read-btn:hover { text-decoration: underline; }
+
+  .demo-toggle { display: flex; gap: 8px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .demo-toggle button { font-size: 11.5px; font-family: 'Inter', sans-serif; padding: 6px 11px; border-radius: 7px; border: 1px solid var(--border); background: var(--white); color: var(--ink-soft); cursor: pointer; }
+  .demo-toggle button.active { background: var(--green-900); color: var(--white); border-color: var(--green-900); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 1.3rem; flex-wrap: wrap; }
+  .filter-chip { font-size: 12px; font-weight: 500; padding: 6px 13px; border-radius: 20px; border: 1px solid var(--border); background: var(--white); color: var(--ink-soft); cursor: pointer; }
+  .filter-chip.active { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+
+  .notif-view.hidden { display: none; }
+
+  .notif-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.1rem; margin-bottom: 9px; display: flex; gap: 12px; cursor: pointer; position: relative; }
+  .notif-item.unread { border-left: 3px solid var(--green-700); }
+  .notif-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--sage-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .notif-content { flex: 1; }
+  .notif-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .notif-item:not(.unread) .notif-title { font-weight: 500; color: var(--ink-soft); }
+  .notif-desc { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; line-height: 1.5; }
+  .notif-time { font-size: 11px; color: var(--ink-soft); margin-top: 5px; }
+  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-700); position: absolute; top: 14px; right: 14px; }
+
+  .loading-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.1rem; margin-bottom: 9px; display: flex; gap: 12px; }
+  .skeleton-circle { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(90deg, var(--green-100) 25%, #EEF2E9 37%, var(--green-100) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; flex-shrink: 0; }
+  .skeleton-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--green-100) 25%, #EEF2E9 37%, var(--green-100) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; margin-bottom: 8px; }
+  @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+  .empty-state, .error-state { display: none; text-align: center; padding: 3rem 1rem; background: var(--white); border: 1px dashed var(--border); border-radius: var(--radius); }
+  .empty-state.show, .error-state.show { display: block; }
+  .empty-icon, .error-icon { font-size: 32px; margin-bottom: 10px; }
+  .empty-title, .error-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+  .empty-sub, .error-sub { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 1rem; }
+  .btn { padding: 10px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; background: var(--green-700); color: var(--white); }
+  .btn:hover { background: var(--green-900); }
+
+  @media (max-width: 480px) {
+    .topbar { padding: 1rem 1.25rem; }
+    .subnav { padding: 0 1.25rem; overflow-x: auto; white-space: nowrap; }
+    main { padding: 1.25rem 1.1rem 3rem; }
+  }
+</style>
+  <link rel="stylesheet" href="assets/kisanqueue-nav.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand"><span>🌾</span><span class="brand-mark">Harvest Link</span></div>
+    <div class="header-right">
+      <div class="farmer-badge">
+        <div class="farmer-avatar">SY</div>
+        <div><div class="farmer-name">Suresh Yadav</div><div class="farmer-village">Kheri Village</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subnav">
+    <span>Dashboard</span><span>/</span><span>Centre finder</span><span>/</span><span>Live queue</span><span>/</span><span class="current">Notifications</span><span>/</span><span>Alerts</span>
+  </div>
+
+  <main>
+    <div class="page-heading">
+      <div class="page-title">Notifications</div>
+      <button class="mark-read-btn" id="markAllReadBtn">Mark all as read</button>
+    </div>
+
+    <div class="demo-toggle">
+      <button class="active" id="btnLoaded">Loaded</button>
+      <button id="btnLoading">Loading</button>
+      <button id="btnEmpty">Empty</button>
+      <button id="btnFailed">Failed sync</button>
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-chip active" data-cat="all">All</button>
+      <button class="filter-chip" data-cat="booking">Bookings</button>
+      <button class="filter-chip" data-cat="queue">Queue</button>
+      <button class="filter-chip" data-cat="payment">Payments</button>
+      <button class="filter-chip" data-cat="centre">Centre notices</button>
+    </div>
+
+    <div class="notif-view" id="loadedView"></div>
+
+    <div class="notif-view hidden" id="loadingView">
+      <div class="loading-item"><div class="skeleton-circle"></div><div style="flex:1;"><div class="skeleton-line" style="width:60%;"></div><div class="skeleton-line" style="width:85%;"></div></div></div>
+      <div class="loading-item"><div class="skeleton-circle"></div><div style="flex:1;"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:75%;"></div></div></div>
+      <div class="loading-item"><div class="skeleton-circle"></div><div style="flex:1;"><div class="skeleton-line" style="width:65%;"></div><div class="skeleton-line" style="width:80%;"></div></div></div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔔</div>
+      <div class="empty-title">No notifications yet</div>
+      <div class="empty-sub">You'll see updates about your bookings and queue status here.</div>
+    </div>
+
+    <div class="error-state" id="errorState">
+      <div class="error-icon">⚠️</div>
+      <div class="error-title">Couldn't sync notifications</div>
+      <div class="error-sub">Check your connection and try again.</div>
+      <button class="btn" id="retryBtn">Retry</button>
+    </div>
+  </main>
+
+<script>
+  const NOTIFICATIONS = [
+    { cat: 'queue', icon: '⏳', title: 'You\u2019re 3rd in line', desc: 'Estimated wait at Centre A is now ~18 minutes.', time: '2 min ago', unread: true },
+    { cat: 'booking', icon: '📅', title: 'Slot confirmed', desc: 'Your booking at Centre A for today, 10:00 AM is confirmed.', time: 'Yesterday, 6:41 PM', unread: true },
+    { cat: 'centre', icon: '📢', title: 'Centre timing changed', desc: 'Centre B will now close at 5:00 PM this week due to maintenance.', time: 'Yesterday, 4:10 PM', unread: false },
+    { cat: 'payment', icon: '💰', title: 'Payment pending', desc: 'Your payment for token #A214 is still being processed.', time: '2 days ago', unread: false },
+    { cat: 'queue', icon: '🔁', title: 'Queue moved', desc: 'Token #A233 has been called to Counter 1.', time: '2 days ago', unread: false }
+  ];
+
+  function renderNotifications(filter) {
+    const view = document.getElementById('loadedView');
+    view.innerHTML = '';
+    const filtered = filter === 'all' ? NOTIFICATIONS : NOTIFICATIONS.filter(n => n.cat === filter);
+    if (filtered.length === 0) {
+      view.innerHTML = '<div style="font-size:13px;color:var(--ink-soft);text-align:center;padding:2rem 0;">No notifications in this category.</div>';
+      return;
+    }
+    filtered.forEach((n, i) => {
+      const item = document.createElement('div');
+      item.className = 'notif-item' + (n.unread ? ' unread' : '');
+      item.innerHTML = '<div class="notif-icon">' + n.icon + '</div>' +
+        '<div class="notif-content"><div class="notif-title">' + n.title + '</div>' +
+        '<div class="notif-desc">' + n.desc + '</div>' +
+        '<div class="notif-time">' + n.time + '</div></div>' +
+        (n.unread ? '<span class="unread-dot"></span>' : '');
+      item.addEventListener('click', () => {
+        n.unread = false;
+        renderNotifications(document.querySelector('.filter-chip.active').dataset.cat);
+      });
+      view.appendChild(item);
+    });
+  }
+
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderNotifications(chip.dataset.cat);
+    });
+  });
+
+  document.getElementById('markAllReadBtn').addEventListener('click', () => {
+    NOTIFICATIONS.forEach(n => n.unread = false);
+    renderNotifications(document.querySelector('.filter-chip.active').dataset.cat);
+  });
+
+  const views = {
+    loaded: document.getElementById('loadedView'),
+    loading: document.getElementById('loadingView'),
+    empty: document.getElementById('emptyState'),
+    error: document.getElementById('errorState')
+  };
+  const demoBtns = {
+    loaded: document.getElementById('btnLoaded'),
+    loading: document.getElementById('btnLoading'),
+    empty: document.getElementById('btnEmpty'),
+    error: document.getElementById('btnFailed')
+  };
+
+  function showDemoState(state) {
+    views.loaded.classList.toggle('hidden', state !== 'loaded');
+    views.loading.classList.toggle('hidden', state !== 'loading');
+    views.empty.classList.toggle('show', state === 'empty');
+    views.error.classList.toggle('show', state === 'error');
+    Object.values(demoBtns).forEach(b => b.classList.remove('active'));
+    demoBtns[state].classList.add('active');
+  }
+
+  demoBtns.loaded.addEventListener('click', () => showDemoState('loaded'));
+  demoBtns.loading.addEventListener('click', () => showDemoState('loading'));
+  demoBtns.empty.addEventListener('click', () => showDemoState('empty'));
+  demoBtns.error.addEventListener('click', () => showDemoState('error'));
+  document.getElementById('retryBtn').addEventListener('click', () => showDemoState('loaded'));
+
+  renderNotifications('all');
+  showDemoState('loaded');
+</script>
+
+  <script src="assets/kisanqueue-nav.js"></script>
+</body>
+</html>
